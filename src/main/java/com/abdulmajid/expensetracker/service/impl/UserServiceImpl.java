@@ -31,24 +31,41 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByPhone(userRequest.getPhone())) {
             throw new InvalidArgumentException("Phone Already in Use....Try Another One.");
         }
+       User user=new User(userRequest.getName(),
+               userRequest.getUserName(),
+               userRequest.getEmail(),
+               userRequest.getPassword(),
+               userRequest.getPhone());
+        userRepository.save(user);
 
-       User user=userRepository.save(
-        User.builder().name(userRequest.getName())
-                .userName(userRequest.getUserName())
-                .email(userRequest.getEmail())
-                .password(userRequest.getPassword())
-                .phone(userRequest.getPhone())
-                .debt(userRequest.getDebt())
-                .createdAt(new Date()).build()
-             );
 
-        return UserResponse.builder().id(user.getId())
-                .name(user.getName())
-                .userName(user.getUserName())
-                .email(user.getEmail())
-                .phone(user.getPhone())
-                .createdAt(user.getCreatedAt())
-                .updated_at(user.getUpdated_at()).build();
+        return new UserResponse(user.getId(),
+                user.getName(),
+                user.getUserName(),
+                user.getPhone(),
+                user.getEmail(),
+                user.getCreatedAt(),
+                user.getUpdatedAt());
+
+
+
+//       User user=userRepository.save(
+//        User.builder().name(userRequest.getName())
+//                .userName(userRequest.getUserName())
+//                .email(userRequest.getEmail())
+//                .password(userRequest.getPassword())
+//                .phone(userRequest.getPhone())
+//                .debt(userRequest.getDebt())
+//                .createdAt(new Date()).build()
+//             );
+
+//        return UserResponse.builder().id(user.getId())
+//                .name(user.getName())
+//                .userName(user.getUserName())
+//                .email(user.getEmail())
+//                .phone(user.getPhone())
+//                .createdAt(user.getCreatedAt())
+//                .updated_at(user.getUpdated_at()).build();
 
     }
 

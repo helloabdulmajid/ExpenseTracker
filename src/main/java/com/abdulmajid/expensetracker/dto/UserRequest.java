@@ -36,7 +36,7 @@ public class UserRequest {
     private String debt;
     private Integer loan;
     private Date createdAt ;
-    private Date updated_at;
+    private Date updatedAt;
 
     public String getName() {
         return name;
@@ -126,11 +126,11 @@ public class UserRequest {
         this.createdAt = createdAt;
     }
 
-    public Date getUpdated_at() {
-        return updated_at;
+    public Date getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setUpdated_at(Date updated_at) {
-        this.updated_at = updated_at;
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }
