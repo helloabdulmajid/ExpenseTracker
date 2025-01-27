@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.abdulmajid</groupId>
-	<artifactId>expensetrackerapp</artifactId>
+	<artifactId>expensetracker</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>ExpenseTrackerApp</name>
+	<name>ExpenseTracker</name>
 	<description>This is Expense Tracker App for Spring Boot</description>
 	<url/>
 	<licenses>
@@ -49,10 +49,20 @@
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
+
+<!--		<dependency>-->
+<!--			<groupId>org.projectlombok</groupId>-->
+<!--			<artifactId>lombok</artifactId>-->
+<!--			<version>1.18.36</version>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 	</dependencies>
 
