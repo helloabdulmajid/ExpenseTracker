@@ -1,4 +1,4 @@
-package com.abdulmajid.expensetracker.exception;
+package com.abdulmajid.expensetracker.exception.custom;
 
 public class UserNotFoundException extends RuntimeException {
     public UserNotFoundException(String message)

@@ -134,4 +134,25 @@ public class User {
     public void setUpdated_at(Date updatedAt) {
         this.updatedAt= updatedAt;
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", userName='" + userName + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", phone='" + phone + '\'' +
+                ", expense=" + expense +
+                ", income=" + income +
+                ", debt='" + debt + '\'' +
+                ", loan=" + loan +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
+    }
+
+    public User() {
+    }
 }

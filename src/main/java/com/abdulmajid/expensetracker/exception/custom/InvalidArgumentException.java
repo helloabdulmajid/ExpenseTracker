@@ -1,4 +1,4 @@
-package com.abdulmajid.expensetracker.exception;
+package com.abdulmajid.expensetracker.exception.custom;
 
 public class InvalidArgumentException extends RuntimeException {
     public InvalidArgumentException(String message) {

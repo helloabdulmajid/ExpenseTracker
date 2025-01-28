@@ -1,11 +1,14 @@
 package com.abdulmajid.expensetracker.dto;
 
+import com.abdulmajid.expensetracker.model.User;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 @Data
 @Builder
@@ -23,6 +26,26 @@ public class UserResponse {
     private Integer loan;
     private Date createdAt ;
     private Date updatedAt;
+
+    public UserResponse(Optional<User> existsUser) {
+
+        this.id = existsUser.get().getId();
+        this.name = existsUser.get().getName();
+        this.userName = existsUser.get().getUserName();
+        this.email = existsUser.get().getEmail();
+        this.phone = existsUser.get().getPhone();
+        this.expense = existsUser.get().getExpense();
+        this.income = existsUser.get().getIncome();
+        this.debt = existsUser.get().getDebt();
+        this.loan = existsUser.get().getLoan();
+        this.createdAt = existsUser.get().getCreatedAt();
+        this.updatedAt = existsUser.get().getUpdatedAt();
+
+
+    }
+
+    public UserResponse(List<User> userList) {
+    }
 
     public Integer getId() {
         return id;
@@ -118,6 +141,20 @@ public class UserResponse {
         this.userName = userName;
         this.email = email;
         this.phone = phone;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
+    public UserResponse(Integer id, String name, String userName, String email, String phone, Integer expense, Integer income, String debt, Integer loan, Date createdAt, Date updatedAt) {
+        this.id = id;
+        this.name = name;
+        this.userName = userName;
+        this.email = email;
+        this.phone = phone;
+        this.expense = expense;
+        this.income = income;
+        this.debt = debt;
+        this.loan = loan;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }

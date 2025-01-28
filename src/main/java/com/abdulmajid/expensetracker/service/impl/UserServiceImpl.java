@@ -2,16 +2,19 @@ package com.abdulmajid.expensetracker.service.impl;
 
 import com.abdulmajid.expensetracker.dto.UserRequest;
 import com.abdulmajid.expensetracker.dto.UserResponse;
-import com.abdulmajid.expensetracker.exception.InvalidArgumentException;
+import com.abdulmajid.expensetracker.exception.custom.InvalidArgumentException;
+import com.abdulmajid.expensetracker.exception.custom.UserNotFoundException;
 import com.abdulmajid.expensetracker.model.User;
 import com.abdulmajid.expensetracker.repository.UserRepository;
 import com.abdulmajid.expensetracker.service.UserService;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -71,16 +74,49 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse getOneUser(Integer userId) {
-        return null;
+
+        Optional<User> existsUser = userRepository.findById(userId);
+        if (existsUser.isPresent())
+        {
+            return new UserResponse(existsUser);
+        }
+        throw  new UserNotFoundException("User With ID " + userId +" is Not Found");
+
+
     }
 
     @Override
     public List<UserResponse> getAllUsers() {
-        return null;
+
+       return userRepository.findAll().stream()
+               .map(user -> new UserResponse(user.getId(),
+                       user.getName(),
+                       user.getUserName(),
+                       user.getEmail(),
+                       user.getPhone(),
+                       user.getExpense(),
+                       user.getIncome(),
+                       user.getDebt(),
+                       user.getLoan(),
+                       user.getCreatedAt(),
+                       user.getUpdatedAt()))
+               .collect(Collectors.toList());
+
+
+
     }
 
     @Override
     public UserResponse updateUser(Integer userId, UserRequest userRequest) {
-        return null;
+        Optional<User> existsUser = userRepository.findById(userId);
+        if (existsUser.isPresent())
+        {
+            User user = existsUser.get();
+            user.setName(userRequest.getName());
+            user.setUserName(userRequest.getUserName());
+            user.setUpdated_at(new Date());
+            return new UserResponse(Optional.of(user));
+        }
+        throw  new UserNotFoundException("User With ID " + userId +" is Not Found");
     }
 }
