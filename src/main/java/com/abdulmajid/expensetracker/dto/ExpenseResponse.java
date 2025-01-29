@@ -1,16 +1,10 @@
-package com.abdulmajid.expensetracker.model;
+package com.abdulmajid.expensetracker.dto;
 
-
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.*;
+import com.abdulmajid.expensetracker.model.User;
 
 import java.util.Date;
 
-@Entity
-@Table(name = "expenses")
-public class Expense {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class ExpenseResponse {
     private Integer id;
     private Integer amount;
     private String paymentMode;
@@ -20,43 +14,23 @@ public class Expense {
     private Date createdAt;
     private Date updatedAt;
 
-    @JsonManagedReference
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
-    
-    @JsonManagedReference
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    private CategoryResponse category;
     private User user;
 
-
-    public Expense() {
+    public ExpenseResponse() {
     }
 
-//    public Expense(Integer id, Integer amount, String paymentMode, String note, String day, String date, Date createdAt, Date updatedAt, Category category, User user) {
-//        this.id = id;
-//        this.amount = amount;
-//        this.paymentMode = paymentMode;
-//        this.note = note;
-//        this.day = day;
-//        this.date = date;
-//        this.createdAt = createdAt;
-//        this.updatedAt = updatedAt;
-//        this.category = category;
-//        this.user = user;
-//    }
-
-    public Expense(Integer amount, String paymentMode, String note, String day, String date, Date createdAt, Date updatedAt, Category dbCategory, User existsUser) {
+    public ExpenseResponse(Integer id, Integer amount, String paymentMode, String note, String day, String date, Date createdAt, Date updatedAt, CategoryResponse category, User user) {
+        this.id = id;
         this.amount = amount;
         this.paymentMode = paymentMode;
         this.note = note;
         this.day = day;
         this.date = date;
-        this.createdAt = new Date();
-        this.updatedAt = new Date();
-        this.category = dbCategory;
-        this.user = existsUser;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.category = category;
+        this.user = user;
     }
 
     public Integer getId() {
@@ -123,11 +97,11 @@ public class Expense {
         this.updatedAt = updatedAt;
     }
 
-    public Category getCategory() {
+    public CategoryResponse getCategory() {
         return category;
     }
 
-    public void setCategory(Category category) {
+    public void setCategory(CategoryResponse category) {
         this.category = category;
     }
 

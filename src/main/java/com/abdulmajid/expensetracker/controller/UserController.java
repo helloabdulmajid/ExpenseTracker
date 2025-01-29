@@ -15,6 +15,7 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
     @PostMapping("/signup")
     public UserResponse createUser(@RequestBody @Valid UserRequest userRequest) {
         return userService.createUser(userRequest);
@@ -36,5 +37,4 @@ public class UserController {
     public UserResponse updateUser(@PathVariable Integer userId, @RequestBody UserRequest userRequest) {
         return userService.updateUser(userId, userRequest);
     }
-
 }

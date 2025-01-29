@@ -24,7 +24,7 @@ public class UserResponse {
     private Integer income;
     private String debt;
     private Integer loan;
-    private Date createdAt ;
+    private Date createdAt;
     private Date updatedAt;
 
     public UserResponse(Optional<User> existsUser) {
@@ -45,6 +45,30 @@ public class UserResponse {
     }
 
     public UserResponse(List<User> userList) {
+    }
+
+    public UserResponse(Integer id, String name, String userName, String phone, String email, Date createdAt, Date updatedAt) {
+        this.id = id;
+        this.name = name;
+        this.userName = userName;
+        this.email = email;
+        this.phone = phone;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
+    public UserResponse(Integer id, String name, String userName, String email, String phone, Integer expense, Integer income, String debt, Integer loan, Date createdAt, Date updatedAt) {
+        this.id = id;
+        this.name = name;
+        this.userName = userName;
+        this.email = email;
+        this.phone = phone;
+        this.expense = expense;
+        this.income = income;
+        this.debt = debt;
+        this.loan = loan;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     public Integer getId() {
@@ -132,30 +156,6 @@ public class UserResponse {
     }
 
     public void setUpdatedAt(Date updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public UserResponse(Integer id, String name, String userName, String phone,String email, Date createdAt, Date updatedAt) {
-        this.id = id;
-        this.name = name;
-        this.userName = userName;
-        this.email = email;
-        this.phone = phone;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
-
-    public UserResponse(Integer id, String name, String userName, String email, String phone, Integer expense, Integer income, String debt, Integer loan, Date createdAt, Date updatedAt) {
-        this.id = id;
-        this.name = name;
-        this.userName = userName;
-        this.email = email;
-        this.phone = phone;
-        this.expense = expense;
-        this.income = income;
-        this.debt = debt;
-        this.loan = loan;
-        this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 }

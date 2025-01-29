@@ -1,15 +1,18 @@
 package com.abdulmajid.expensetracker.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-@Table(name="users")
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,10 +27,20 @@ public class User {
     private Integer income;
     private String debt;
     private Integer loan;
-  //  @Column(name = "created_at")
     private Date createdAt = new Date();
-  //  @Column(name = "updated_at")
     private Date updatedAt;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Expense> expenses;
+
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<Income> incomes;
+//
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<Loan> loans;
+//
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<Debt> debts;
 
     public User(String name, String userName, String email, String password, String phone) {
         this.name = name;
@@ -36,7 +49,10 @@ public class User {
         this.password = password;
         this.phone = phone;
         this.createdAt = new Date();
-        this.updatedAt=new Date();
+        this.updatedAt = new Date();
+    }
+
+    public User() {
     }
 
     public Integer getId() {
@@ -132,7 +148,7 @@ public class User {
     }
 
     public void setUpdated_at(Date updatedAt) {
-        this.updatedAt= updatedAt;
+        this.updatedAt = updatedAt;
     }
 
     @Override
@@ -151,8 +167,5 @@ public class User {
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';
-    }
-
-    public User() {
     }
 }

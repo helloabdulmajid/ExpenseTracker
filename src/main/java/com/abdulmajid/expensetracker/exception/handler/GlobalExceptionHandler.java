@@ -1,5 +1,6 @@
 package com.abdulmajid.expensetracker.exception.handler;
 
+import com.abdulmajid.expensetracker.exception.custom.CategoryNotFoundException;
 import com.abdulmajid.expensetracker.exception.custom.InvalidArgumentException;
 import com.abdulmajid.expensetracker.exception.custom.UserNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -11,20 +12,23 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException ex)
-    {
+    public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
     @ExceptionHandler(InvalidArgumentException.class)
-    public ResponseEntity<String> handleInvalidArgumentException(InvalidArgumentException ex)
-    {
+    public ResponseEntity<String> handleInvalidArgumentException(InvalidArgumentException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(CategoryNotFoundException.class)
+    public ResponseEntity<String> handleCategoryNotFoundException(CategoryNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleGlobalException(Exception ex)
-    {
+    public ResponseEntity<String> handleGlobalException(Exception ex) {
+        ex.printStackTrace(); // Log the full stack trace for debugging
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong. Please try again later.");
     }
 }

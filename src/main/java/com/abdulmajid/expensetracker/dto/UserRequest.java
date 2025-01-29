@@ -35,7 +35,7 @@ public class UserRequest {
     private Integer income;
     private String debt;
     private Integer loan;
-    private Date createdAt ;
+    private Date createdAt;
     private Date updatedAt;
 
     public String getName() {

@@ -20,6 +20,7 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
+
     @Override
     public UserResponse createUser(UserRequest userRequest) {
         if (!userRequest.getPassword().equals(userRequest.getcPassword())) {
@@ -34,11 +35,11 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByPhone(userRequest.getPhone())) {
             throw new InvalidArgumentException("Phone Already in Use....Try Another One.");
         }
-       User user=new User(userRequest.getName(),
-               userRequest.getUserName(),
-               userRequest.getEmail(),
-               userRequest.getPassword(),
-               userRequest.getPhone());
+        User user = new User(userRequest.getName(),
+                userRequest.getUserName(),
+                userRequest.getEmail(),
+                userRequest.getPassword(),
+                userRequest.getPhone());
         userRepository.save(user);
 
 
@@ -49,7 +50,6 @@ public class UserServiceImpl implements UserService {
                 user.getEmail(),
                 user.getCreatedAt(),
                 user.getUpdatedAt());
-
 
 
 //       User user=userRepository.save(
@@ -76,11 +76,10 @@ public class UserServiceImpl implements UserService {
     public UserResponse getOneUser(Integer userId) {
 
         Optional<User> existsUser = userRepository.findById(userId);
-        if (existsUser.isPresent())
-        {
+        if (existsUser.isPresent()) {
             return new UserResponse(existsUser);
         }
-        throw  new UserNotFoundException("User With ID " + userId +" is Not Found");
+        throw new UserNotFoundException("User With ID " + userId + " is Not Found");
 
 
     }
@@ -88,20 +87,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserResponse> getAllUsers() {
 
-       return userRepository.findAll().stream()
-               .map(user -> new UserResponse(user.getId(),
-                       user.getName(),
-                       user.getUserName(),
-                       user.getEmail(),
-                       user.getPhone(),
-                       user.getExpense(),
-                       user.getIncome(),
-                       user.getDebt(),
-                       user.getLoan(),
-                       user.getCreatedAt(),
-                       user.getUpdatedAt()))
-               .collect(Collectors.toList());
-
+        return userRepository.findAll().stream()
+                .map(user -> new UserResponse(user.getId(),
+                        user.getName(),
+                        user.getUserName(),
+                        user.getEmail(),
+                        user.getPhone(),
+                        user.getExpense(),
+                        user.getIncome(),
+                        user.getDebt(),
+                        user.getLoan(),
+                        user.getCreatedAt(),
+                        user.getUpdatedAt()))
+                .collect(Collectors.toList());
 
 
     }
@@ -109,14 +107,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse updateUser(Integer userId, UserRequest userRequest) {
         Optional<User> existsUser = userRepository.findById(userId);
-        if (existsUser.isPresent())
-        {
+        if (existsUser.isPresent()) {
             User user = existsUser.get();
             user.setName(userRequest.getName());
             user.setUserName(userRequest.getUserName());
             user.setUpdated_at(new Date());
             return new UserResponse(Optional.of(user));
         }
-        throw  new UserNotFoundException("User With ID " + userId +" is Not Found");
+        throw new UserNotFoundException("User With ID " + userId + " is Not Found");
     }
 }

@@ -4,14 +4,13 @@
 //import java.util.Date;
 //
 //@Entity
-//@Table(name="incomes")
-//public class Income {
+//@Table(name="debts")
+//public class Debt {
 //    @Id
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
 //    private Integer id;
 //    private Integer amount;
-//    private String source;
-//    private String paymentMode;
+//    private String creditor;
 //    private String note;
 //    private Date createdAt ;
 //    private Date updatedAt;
