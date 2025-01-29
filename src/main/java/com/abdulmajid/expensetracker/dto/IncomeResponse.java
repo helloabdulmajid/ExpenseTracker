@@ -1,14 +1,10 @@
-package com.abdulmajid.expensetracker.model;
+package com.abdulmajid.expensetracker.dto;
 
-import jakarta.persistence.*;
+import com.abdulmajid.expensetracker.model.User;
 
 import java.util.Date;
 
-@Entity
-@Table(name = "incomes")
-public class Income {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class IncomeResponse {
     private Integer id;
     private Integer amount;
     private String source;
@@ -18,25 +14,22 @@ public class Income {
     private String date;
     private Date createdAt;
     private Date updatedAt;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public Income() {
+    public IncomeResponse() {
     }
 
-    // this use for create only
-    public Income(Integer amount, String source, String receiveMode,
-                  String note, String day, String date, User user) {
+    public IncomeResponse(Integer id, Integer amount, String source, String receiveMode,
+                          String note, String day, String date, Date createdAt, Date updatedAt, User user) {
+        this.id = id;
         this.amount = amount;
         this.source = source;
         this.receiveMode = receiveMode;
         this.note = note;
         this.day = day;
         this.date = date;
-        this.createdAt = new Date();
-        this.updatedAt = new Date();
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
         this.user = user;
     }
 

@@ -1,14 +1,8 @@
-package com.abdulmajid.expensetracker.model;
-
-import jakarta.persistence.*;
+package com.abdulmajid.expensetracker.dto;
 
 import java.util.Date;
 
-@Entity
-@Table(name = "incomes")
-public class Income {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class IncomeRequest {
     private Integer id;
     private Integer amount;
     private String source;
@@ -18,26 +12,24 @@ public class Income {
     private String date;
     private Date createdAt;
     private Date updatedAt;
+    private Integer userId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
-    public Income() {
+    public IncomeRequest() {
     }
 
-    // this use for create only
-    public Income(Integer amount, String source, String receiveMode,
-                  String note, String day, String date, User user) {
+    public IncomeRequest(Integer id, Integer amount, String source, String receiveMode,
+                         String note, String day, String date, Date createdAt,
+                         Date updatedAt, Integer userId) {
+        this.id = id;
         this.amount = amount;
         this.source = source;
         this.receiveMode = receiveMode;
         this.note = note;
         this.day = day;
         this.date = date;
-        this.createdAt = new Date();
-        this.updatedAt = new Date();
-        this.user = user;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.userId = userId;
     }
 
     public Integer getId() {
@@ -112,11 +104,11 @@ public class Income {
         this.updatedAt = updatedAt;
     }
 
-    public User getUser() {
-        return user;
+    public Integer getUserId() {
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 }
