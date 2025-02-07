@@ -1,6 +1,6 @@
 package com.abdulmajid.expensetracker.enums;
 
-public enum DefaultCategory {
+public enum DefaultExpenseCategory {
     FOOD,
     TRANSPORT,
     HEALTH,

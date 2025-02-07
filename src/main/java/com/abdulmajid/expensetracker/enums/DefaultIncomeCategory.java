@@ -5,5 +5,5 @@ public enum DefaultIncomeCategory {
     INCOMING_TRANSFER,
     OTHERS_INCOME,
     FREELANCING,
-    COLLECT_INTEREST,
+    COLLECT_INTEREST;
 }

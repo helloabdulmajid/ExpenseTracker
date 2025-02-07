@@ -1,14 +1,14 @@
 package com.abdulmajid.expensetracker.dto;
 
-public class CategoryResponse {
+public class IncomeCategoryResponse {
     private Integer id;
     private String categoryName;
     private boolean isDefaultCategory;
 
-    public CategoryResponse() {
+    public IncomeCategoryResponse() {
     }
 
-    public CategoryResponse(Integer id, String categoryName, boolean isDefaultCategory) {
+    public IncomeCategoryResponse(Integer id, String categoryName, boolean isDefaultCategory) {
         this.id = id;
         this.categoryName = categoryName;
         this.isDefaultCategory = isDefaultCategory;

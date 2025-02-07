@@ -1,25 +1,26 @@
 package com.abdulmajid.expensetracker.config;
 
 import com.abdulmajid.expensetracker.enums.DefaultIncomeCategory;
-import com.abdulmajid.expensetracker.model.Category;
-import com.abdulmajid.expensetracker.repository.CategoryRepository;
+import com.abdulmajid.expensetracker.model.IncomeCategory;
+import com.abdulmajid.expensetracker.repository.IncomeCategoryRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class DefaultIncomeCategoryInitializer {
+
     @Autowired
-    private CategoryRepository categoryRepository;
+    private IncomeCategoryRepository incomeCategoryRepository;
 
     @PostConstruct
     public void initDefaultIncomeCategories() {
         for (DefaultIncomeCategory defaultIncomeCategory : DefaultIncomeCategory.values()) {
-            if (!categoryRepository.existsByCategoryName(defaultIncomeCategory.name())) {
-                Category category = new Category();
-                category.setCategoryName(defaultIncomeCategory.name());
-                category.setDefaultCategory(true);
-                categoryRepository.save(category);
+            if (!incomeCategoryRepository.existsByCategoryName(defaultIncomeCategory.name())) {
+                IncomeCategory incomeCategory = new IncomeCategory();
+                incomeCategory.setCategoryName(defaultIncomeCategory.name());
+                incomeCategory.setDefaultCategory(true);
+                incomeCategoryRepository.save(incomeCategory);
             }
         }
     }

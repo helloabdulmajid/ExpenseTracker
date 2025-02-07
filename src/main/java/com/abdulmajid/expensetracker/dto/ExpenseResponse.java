@@ -14,13 +14,13 @@ public class ExpenseResponse {
     private Date createdAt;
     private Date updatedAt;
 
-    private CategoryResponse category;
+    private ExpenseCategoryResponse category;
     private User user;
 
     public ExpenseResponse() {
     }
 
-    public ExpenseResponse(Integer id, Integer amount, String paymentMode, String note, String day, String date, Date createdAt, Date updatedAt, CategoryResponse category, User user) {
+    public ExpenseResponse(Integer id, Integer amount, String paymentMode, String note, String day, String date, Date createdAt, Date updatedAt, ExpenseCategoryResponse category, User user) {
         this.id = id;
         this.amount = amount;
         this.paymentMode = paymentMode;
@@ -97,11 +97,11 @@ public class ExpenseResponse {
         this.updatedAt = updatedAt;
     }
 
-    public CategoryResponse getCategory() {
+    public ExpenseCategoryResponse getCategory() {
         return category;
     }
 
-    public void setCategory(CategoryResponse category) {
+    public void setCategory(ExpenseCategoryResponse category) {
         this.category = category;
     }
 

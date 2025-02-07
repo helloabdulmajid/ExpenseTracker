@@ -11,7 +11,7 @@ public class Income {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private Integer amount;
-    private String source;
+    private String sourceCategory;
     private String receiveMode;
     private String note;
     private String day;
@@ -27,10 +27,10 @@ public class Income {
     }
 
     // this use for create only
-    public Income(Integer amount, String source, String receiveMode,
+    public Income(Integer amount, String sourceCategory, String receiveMode,
                   String note, String day, String date, User user) {
         this.amount = amount;
-        this.source = source;
+        this.sourceCategory = sourceCategory;
         this.receiveMode = receiveMode;
         this.note = note;
         this.day = day;
@@ -56,12 +56,12 @@ public class Income {
         this.amount = amount;
     }
 
-    public String getSource() {
-        return source;
+    public String getSourceCategory() {
+        return sourceCategory;
     }
 
-    public void setSource(String source) {
-        this.source = source;
+    public void setSourceCategory(String sourceCategory) {
+        this.sourceCategory = sourceCategory;
     }
 
     public String getReceiveMode() {

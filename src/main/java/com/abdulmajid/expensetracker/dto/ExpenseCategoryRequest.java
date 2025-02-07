@@ -1,14 +1,14 @@
 package com.abdulmajid.expensetracker.dto;
 
-public class CategoryRequest {
+public class ExpenseCategoryRequest {
     private Integer id;
     private String categoryName; // Only required field in request
 
     // Constructors
-    public CategoryRequest() {
+    public ExpenseCategoryRequest() {
     }
 
-    public CategoryRequest(Integer id, String categoryName) {
+    public ExpenseCategoryRequest(Integer id, String categoryName) {
         this.id = id;
         this.categoryName = categoryName;
     }

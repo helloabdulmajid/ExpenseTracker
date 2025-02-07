@@ -3,10 +3,10 @@ package com.abdulmajid.expensetracker.service.impl;
 import com.abdulmajid.expensetracker.dto.IncomeRequest;
 import com.abdulmajid.expensetracker.dto.IncomeResponse;
 import com.abdulmajid.expensetracker.exception.custom.UserNotFoundException;
-import com.abdulmajid.expensetracker.model.Category;
+import com.abdulmajid.expensetracker.model.ExpenseCategory;
 import com.abdulmajid.expensetracker.model.Income;
 import com.abdulmajid.expensetracker.model.User;
-import com.abdulmajid.expensetracker.repository.CategoryRepository;
+import com.abdulmajid.expensetracker.repository.ExpenseCategoryRepository;
 import com.abdulmajid.expensetracker.repository.IncomeRepository;
 import com.abdulmajid.expensetracker.repository.UserRepository;
 import com.abdulmajid.expensetracker.service.IncomeService;
@@ -24,7 +24,7 @@ public class IncomeServiceImpl implements IncomeService {
     private UserRepository userRepository;
 
     @Autowired
-    private CategoryRepository categoryRepository;
+    private ExpenseCategoryRepository expenseCategoryRepository;
 
     @Override
     public IncomeResponse createIncomeForUser(Integer userId, IncomeRequest incomeRequest) {
@@ -35,9 +35,9 @@ public class IncomeServiceImpl implements IncomeService {
 
 
         //get category from source
-        Category dbCategory = categoryRepository.findByCategoryName(incomeRequest.getSource());
+        ExpenseCategory dbExpenseCategory = expenseCategoryRepository.findByCategoryName(incomeRequest.getSource());
 
-        System.out.printf(dbCategory + "fhf");
+        System.out.printf(dbExpenseCategory + "fhf");
 
         // save source as a string in source income table
         Income income = new Income(incomeRequest.getAmount(), incomeRequest.getSource(),
@@ -47,7 +47,7 @@ public class IncomeServiceImpl implements IncomeService {
         Income saveIncome = incomeRepository.save(income);
 
         return new IncomeResponse(saveIncome.getId(), saveIncome.getAmount(),
-                saveIncome.getSource(), saveIncome.getReceiveMode(), saveIncome.getNote(),
+                saveIncome.getSourceCategory(), saveIncome.getReceiveMode(), saveIncome.getNote(),
                 saveIncome.getDay(), saveIncome.getDate(), saveIncome.getCreatedAt(),
                 saveIncome.getUpdatedAt(), saveIncome.getUser());
 

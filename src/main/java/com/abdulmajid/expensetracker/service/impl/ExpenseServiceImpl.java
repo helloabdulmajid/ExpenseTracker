@@ -1,14 +1,14 @@
 package com.abdulmajid.expensetracker.service.impl;
 
-import com.abdulmajid.expensetracker.dto.CategoryResponse;
+import com.abdulmajid.expensetracker.dto.ExpenseCategoryResponse;
 import com.abdulmajid.expensetracker.dto.ExpenseRequest;
 import com.abdulmajid.expensetracker.dto.ExpenseResponse;
 import com.abdulmajid.expensetracker.exception.custom.CategoryNotFoundException;
 import com.abdulmajid.expensetracker.exception.custom.UserNotFoundException;
-import com.abdulmajid.expensetracker.model.Category;
 import com.abdulmajid.expensetracker.model.Expense;
+import com.abdulmajid.expensetracker.model.ExpenseCategory;
 import com.abdulmajid.expensetracker.model.User;
-import com.abdulmajid.expensetracker.repository.CategoryRepository;
+import com.abdulmajid.expensetracker.repository.ExpenseCategoryRepository;
 import com.abdulmajid.expensetracker.repository.ExpenseRepository;
 import com.abdulmajid.expensetracker.repository.UserRepository;
 import com.abdulmajid.expensetracker.service.ExpenseService;
@@ -21,7 +21,7 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Autowired
     private ExpenseRepository expenseRepository;
     @Autowired
-    private CategoryRepository categoryRepository;
+    private ExpenseCategoryRepository expenseCategoryRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -34,7 +34,7 @@ public class ExpenseServiceImpl implements ExpenseService {
                 .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
 
         //get category from categoryId
-        Category dbCategory = categoryRepository.findById(expenseRequest.getCategoryId())
+        ExpenseCategory dbExpenseCategory = expenseCategoryRepository.findById(expenseRequest.getCategoryId())
                 .orElseThrow(() -> new CategoryNotFoundException("Category not found with ID: " + expenseRequest.getCategoryId()));
 
         //create expense
@@ -45,7 +45,7 @@ public class ExpenseServiceImpl implements ExpenseService {
                 expenseRequest.getDate(),
                 expenseRequest.getCreatedAt(),
                 expenseRequest.getUpdatedAt(),
-                dbCategory,
+                dbExpenseCategory,
                 existsUser);
 
 
@@ -54,12 +54,12 @@ public class ExpenseServiceImpl implements ExpenseService {
 
         // Return ExpenseResponse (with category details)
 
-        CategoryResponse categoryResponse = new CategoryResponse(dbCategory.getId(),
-                dbCategory.getCategoryName(), dbCategory.isDefaultCategory());
+        ExpenseCategoryResponse expenseCategoryResponse = new ExpenseCategoryResponse(dbExpenseCategory.getId(),
+                dbExpenseCategory.getCategoryName(), dbExpenseCategory.isDefaultCategory());
 
         return new ExpenseResponse(expense.getId(), expense.getAmount(), expense.getPaymentMode(),
                 expense.getNote(), expense.getDay(), expense.getDate(), expense.getCreatedAt(),
-                expense.getUpdatedAt(), categoryResponse, existsUser);
+                expense.getUpdatedAt(), expenseCategoryResponse, existsUser);
 
     }
 }

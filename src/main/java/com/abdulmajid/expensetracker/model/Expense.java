@@ -23,7 +23,7 @@ public class Expense {
     @JsonManagedReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
+    private ExpenseCategory expenseCategory;
 
     @JsonManagedReference
     @ManyToOne(fetch = FetchType.LAZY)
@@ -34,20 +34,8 @@ public class Expense {
     public Expense() {
     }
 
-//    public Expense(Integer id, Integer amount, String paymentMode, String note, String day, String date, Date createdAt, Date updatedAt, Category category, User user) {
-//        this.id = id;
-//        this.amount = amount;
-//        this.paymentMode = paymentMode;
-//        this.note = note;
-//        this.day = day;
-//        this.date = date;
-//        this.createdAt = createdAt;
-//        this.updatedAt = updatedAt;
-//        this.category = category;
-//        this.user = user;
-//    }
 
-    public Expense(Integer amount, String paymentMode, String note, String day, String date, Date createdAt, Date updatedAt, Category dbCategory, User existsUser) {
+    public Expense(Integer amount, String paymentMode, String note, String day, String date, Date createdAt, Date updatedAt, ExpenseCategory dbExpenseCategory, User existsUser) {
         this.amount = amount;
         this.paymentMode = paymentMode;
         this.note = note;
@@ -55,7 +43,7 @@ public class Expense {
         this.date = date;
         this.createdAt = new Date();
         this.updatedAt = new Date();
-        this.category = dbCategory;
+        this.expenseCategory = dbExpenseCategory;
         this.user = existsUser;
     }
 
@@ -123,12 +111,12 @@ public class Expense {
         this.updatedAt = updatedAt;
     }
 
-    public Category getCategory() {
-        return category;
+    public ExpenseCategory getCategory() {
+        return expenseCategory;
     }
 
-    public void setCategory(Category category) {
-        this.category = category;
+    public void setCategory(ExpenseCategory expenseCategory) {
+        this.expenseCategory = expenseCategory;
     }
 
     public User getUser() {

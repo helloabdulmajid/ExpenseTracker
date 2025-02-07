@@ -25,5 +25,6 @@ public class IncomeController {
     public List<Income> getIncomeForUser(@PathVariable Integer userId) {
         return incomeService.getIncomeForUser(userId);
     }
+
 }
 

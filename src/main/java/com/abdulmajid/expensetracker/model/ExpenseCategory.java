@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "categories")
-public class Category {
+@Table(name = "expense_categories")
+public class ExpenseCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,10 +22,10 @@ public class Category {
     private User user;
 
     // Constructors
-    public Category() {
+    public ExpenseCategory() {
     }
 
-    public Category(Integer id, String categoryName, boolean isDefaultCategory, User user) {
+    public ExpenseCategory(Integer id, String categoryName, boolean isDefaultCategory, User user) {
         this.id = id;
         this.categoryName = categoryName;
         this.isDefaultCategory = isDefaultCategory;
