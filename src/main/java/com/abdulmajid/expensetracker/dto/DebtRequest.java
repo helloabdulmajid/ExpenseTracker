@@ -1,14 +1,8 @@
-package com.abdulmajid.expensetracker.model;
-
-import jakarta.persistence.*;
+package com.abdulmajid.expensetracker.dto;
 
 import java.util.Date;
 
-@Entity
-@Table(name = "debts")
-public class Debt {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class DebtRequest {
     private Integer id;
     private Integer amount;
     private String creditor; // Who gives the debt is owed to(Credit card,Bank,person)
@@ -18,8 +12,7 @@ public class Debt {
     private Date dueDate;
     private String status; // OUTSTANDING, PAID, OVERDUE
     private String priority; // HIGH, MEDIUM, LOW
-    @Column(columnDefinition = "BOOLEAN") // not working now
-    private Boolean isRecurring; // True for recurring debts like credit card emi
+    private boolean isRecurring; // True for recurring debts like credit card emi
     private String category; // Medical, Utility, Credit Card
     private String note;
     private String day;
@@ -27,17 +20,12 @@ public class Debt {
     private Date createdAt;
     private Date updatedAt;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
-    public Debt() {
+    public DebtRequest() {
     }
 
-    public Debt(Integer amount, String creditor, String creditorName,
-                String debtor, String debtorName, Date dueDate, String status,
-                String priority, Boolean isRecurring, String category, String note,
-                String day, String date, Date createdAt, Date updatedAt, User user) {
+    public DebtRequest(Integer amount, String creditor, String creditorName, String debtor,
+                       String debtorName, Date dueDate, String status, String priority,
+                       boolean isRecurring, String category, String note, String day, String date) {
         this.amount = amount;
         this.creditor = creditor;
         this.creditorName = creditorName;
@@ -53,7 +41,6 @@ public class Debt {
         this.date = date;
         this.createdAt = new Date();
         this.updatedAt = new Date();
-        this.user = user;
     }
 
     public Integer getId() {
@@ -128,11 +115,11 @@ public class Debt {
         this.priority = priority;
     }
 
-    public Boolean isRecurring() {
+    public boolean isRecurring() {
         return isRecurring;
     }
 
-    public void setRecurring(Boolean recurring) {
+    public void setRecurring(boolean recurring) {
         isRecurring = recurring;
     }
 
@@ -182,13 +169,5 @@ public class Debt {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 }

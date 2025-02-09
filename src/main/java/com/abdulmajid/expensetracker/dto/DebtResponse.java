@@ -1,43 +1,36 @@
-package com.abdulmajid.expensetracker.model;
+package com.abdulmajid.expensetracker.dto;
 
-import jakarta.persistence.*;
+import com.abdulmajid.expensetracker.model.User;
 
 import java.util.Date;
 
-@Entity
-@Table(name = "debts")
-public class Debt {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class DebtResponse {
     private Integer id;
     private Integer amount;
-    private String creditor; // Who gives the debt is owed to(Credit card,Bank,person)
-    private String creditorName; // Who gives the debt is owed to(axis flipkart cc,idfc,bob)
-    private String debtor; // Who gives the debt Or A debtor is a company or individual who owes money
-    private String debtorName;   // Name of that debtor
+    private String creditor;
+    private String creditorName;
+    private String debtor;
+    private String debtorName;
     private Date dueDate;
-    private String status; // OUTSTANDING, PAID, OVERDUE
-    private String priority; // HIGH, MEDIUM, LOW
-    @Column(columnDefinition = "BOOLEAN") // not working now
-    private Boolean isRecurring; // True for recurring debts like credit card emi
-    private String category; // Medical, Utility, Credit Card
+    private String status;
+    private String priority;
+    private boolean isRecurring;
+    private String category;
     private String note;
     private String day;
     private String date;
     private Date createdAt;
     private Date updatedAt;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public Debt() {
+    public DebtResponse() {
     }
 
-    public Debt(Integer amount, String creditor, String creditorName,
-                String debtor, String debtorName, Date dueDate, String status,
-                String priority, Boolean isRecurring, String category, String note,
-                String day, String date, Date createdAt, Date updatedAt, User user) {
+    public DebtResponse(Integer id, Integer amount, String creditor, String creditorName,
+                        String debtor, String debtorName, Date dueDate, String status,
+                        String priority, boolean isRecurring, String category, String note,
+                        String day, String date, Date createdAt, Date updatedAt, User user) {
+        this.id = id;
         this.amount = amount;
         this.creditor = creditor;
         this.creditorName = creditorName;
@@ -51,8 +44,8 @@ public class Debt {
         this.note = note;
         this.day = day;
         this.date = date;
-        this.createdAt = new Date();
-        this.updatedAt = new Date();
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
         this.user = user;
     }
 
@@ -128,12 +121,12 @@ public class Debt {
         this.priority = priority;
     }
 
-    public Boolean isRecurring() {
+    public boolean isRecurring() {
         return isRecurring;
     }
 
-    public void setRecurring(Boolean recurring) {
-        isRecurring = recurring;
+    public boolean setRecurring(boolean isRecurring) {
+        return isRecurring = isRecurring;
     }
 
     public String getCategory() {

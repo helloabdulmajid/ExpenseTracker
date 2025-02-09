@@ -37,7 +37,7 @@ public class IncomeServiceImpl implements IncomeService {
         //get category from source
         ExpenseCategory dbExpenseCategory = expenseCategoryRepository.findByCategoryName(incomeRequest.getSource());
 
-        System.out.printf(dbExpenseCategory + "fhf");
+        // System.out.printf(dbExpenseCategory + "fhf");
 
         // save source as a string in source income table
         Income income = new Income(incomeRequest.getAmount(), incomeRequest.getSource(),
