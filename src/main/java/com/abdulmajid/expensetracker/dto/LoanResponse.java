@@ -1,47 +1,38 @@
-package com.abdulmajid.expensetracker.model;
+package com.abdulmajid.expensetracker.dto;
 
-import jakarta.persistence.*;
+import com.abdulmajid.expensetracker.model.User;
 
 import java.util.Date;
 
-@Entity
-@Table(name = "loans")
-public class Loan {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class LoanResponse {
     private Integer id;
     private Integer amount;
     private String lender;  // Who provided the loan
     private String borrower; // Optional, if applicable
     private Double interestRate;
-    private String loanType; // e.g., Personal, Business, Education
-    private Integer tenureMonths; // Duration in months
+    private String loanType;
+    private Integer tenureMonths;
     private Date startDate;
     private Date dueDate;
-    private String paymentMode; // CASH, BANK_TRANSFER, ONLINE
+    private String paymentMode;
     private String isPaid;
     private Double remainingBalance;
-    private String status; // ACTIVE, PENDING, CLOSED
+    private String status;
     private String note;
     private String day;
     private Date date;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt = new Date();
-
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updatedAt = new Date();
-
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    private Date createdAt;
+    private Date updatedAt;
     private User user;
 
-    public Loan() {
+    public LoanResponse() {
     }
 
-    public Loan(Integer amount, String lender, String borrower, Double interestRate, String loanType,
-                Integer tenureMonths, Date startDate, Date dueDate, String paymentMode, String isPaid,
-                Double remainingBalance, String status, String note, String day, Date date, User user) {
+    public LoanResponse(Integer id, Integer amount, String lender, String borrower, Double interestRate,
+                        String loanType, Integer tenureMonths, Date startDate, Date dueDate,
+                        String paymentMode, String isPaid, Double remainingBalance, String status,
+                        String note, String day, Date date, Date createdAt, Date updatedAt, User user) {
+        this.id = id;
         this.amount = amount;
         this.lender = lender;
         this.borrower = borrower;
@@ -57,6 +48,8 @@ public class Loan {
         this.note = note;
         this.day = day;
         this.date = date;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
         this.user = user;
     }
 
