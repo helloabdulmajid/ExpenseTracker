@@ -67,4 +67,18 @@ public class LoanServiceImpl implements LoanService {
         return responseList;
 
     }
+
+    @Override
+    public LoanResponse getOneLoan(Integer loanId) {
+
+        Loan loan = loanRepository.findById(loanId)
+                .orElseThrow(() -> new UserNotFoundException("Loan not found with ID: " + loanId));
+
+        return new LoanResponse(loan.getId(), loan.getAmount(), loan.getLender(),
+                loan.getBorrower(), loan.getInterestRate(), loan.getLoanType(),
+                loan.getTenureMonths(), loan.getStartDate(), loan.getDueDate(),
+                loan.getPaymentMode(), loan.getIsPaid(), loan.getRemainingBalance(),
+                loan.getStatus(), loan.getNote(), loan.getDay(), loan.getDate(),
+                loan.getCreatedAt(), loan.getUpdatedAt(), loan.getUser());
+    }
 }

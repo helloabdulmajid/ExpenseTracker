@@ -20,12 +20,13 @@ public class LoanController {
                                           @RequestBody LoanRequest loanRequest) {
         return loanService.createLoanForUser(userId, loanRequest);
     }
-//    @GetMapping("/{userId}")
-//    public Debt getDebtForUser(@PathVariable Integer userId) {
-//        return debtService.getDebtForUser(userId);
-//    }
 
-    @GetMapping("/{userId}")
+    @GetMapping("/getloan/{loanId}")
+    public LoanResponse getOneloan(@PathVariable Integer loanId) {
+        return loanService.getOneLoan(loanId);
+    }
+
+    @GetMapping("/getloans/{userId}")
     public List<LoanResponse> getAllLoanForUser(@PathVariable Integer userId) {
         return loanService.getAllLoanForUser(userId);
     }

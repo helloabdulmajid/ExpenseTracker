@@ -9,4 +9,6 @@ public interface LoanService {
     LoanResponse createLoanForUser(Integer userId, LoanRequest loanRequest);
 
     List<LoanResponse> getAllLoanForUser(Integer userId);
+
+    LoanResponse getOneLoan(Integer loanId);
 }
