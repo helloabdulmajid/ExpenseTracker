@@ -1,10 +1,11 @@
 package com.abdulmajid.expensetracker.dto;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class DebtRequest {
     private Integer id;
-    private Integer amount;
+    private BigDecimal amount;
     private String creditor; // Who gives the debt is owed to(Credit card,Bank,person)
     private String creditorName; // Who gives the debt is owed to(axis flipkart cc,idfc,bob)
     private String debtor; // Who gives the debt Or A debtor is a company or individual who owes money
@@ -23,7 +24,7 @@ public class DebtRequest {
     public DebtRequest() {
     }
 
-    public DebtRequest(Integer amount, String creditor, String creditorName, String debtor,
+    public DebtRequest(BigDecimal amount, String creditor, String creditorName, String debtor,
                        String debtorName, Date dueDate, String status, String priority,
                        boolean isRecurring, String category, String note, String day, String date) {
         this.amount = amount;
@@ -51,11 +52,11 @@ public class DebtRequest {
         this.id = id;
     }
 
-    public Integer getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Integer amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 

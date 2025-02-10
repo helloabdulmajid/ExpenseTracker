@@ -2,11 +2,12 @@ package com.abdulmajid.expensetracker.dto;
 
 import com.abdulmajid.expensetracker.model.User;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class IncomeResponse {
     private Integer id;
-    private Integer amount;
+    private BigDecimal amount;
     private String source;
     private String receiveMode;
     private String note;
@@ -19,7 +20,7 @@ public class IncomeResponse {
     public IncomeResponse() {
     }
 
-    public IncomeResponse(Integer id, Integer amount, String source, String receiveMode,
+    public IncomeResponse(Integer id, BigDecimal amount, String source, String receiveMode,
                           String note, String day, String date, Date createdAt, Date updatedAt, User user) {
         this.id = id;
         this.amount = amount;
@@ -33,6 +34,19 @@ public class IncomeResponse {
         this.user = user;
     }
 
+    public IncomeResponse(Integer id, BigDecimal amount, String source, String receiveMode,
+                          String note, String day, String date, Date createdAt, Date updatedAt) {
+        this.id = id;
+        this.amount = amount;
+        this.source = source;
+        this.receiveMode = receiveMode;
+        this.note = note;
+        this.day = day;
+        this.date = date;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
     public Integer getId() {
         return id;
     }
@@ -41,11 +55,11 @@ public class IncomeResponse {
         this.id = id;
     }
 
-    public Integer getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Integer amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 

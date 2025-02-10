@@ -2,6 +2,7 @@ package com.abdulmajid.expensetracker.model;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -10,7 +11,8 @@ public class Income {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private Integer amount;
+    @Column(precision = 10, scale = 2)
+    private BigDecimal amount;
     private String sourceCategory;
     private String receiveMode;
     private String note;
@@ -27,7 +29,7 @@ public class Income {
     }
 
     // this use for create only
-    public Income(Integer amount, String sourceCategory, String receiveMode,
+    public Income(BigDecimal amount, String sourceCategory, String receiveMode,
                   String note, String day, String date, User user) {
         this.amount = amount;
         this.sourceCategory = sourceCategory;
@@ -48,11 +50,11 @@ public class Income {
         this.id = id;
     }
 
-    public Integer getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Integer amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 

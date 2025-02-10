@@ -2,11 +2,12 @@ package com.abdulmajid.expensetracker.dto;
 
 import com.abdulmajid.expensetracker.model.User;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class DebtResponse {
     private Integer id;
-    private Integer amount;
+    private BigDecimal amount;
     private String creditor;
     private String creditorName;
     private String debtor;
@@ -26,7 +27,7 @@ public class DebtResponse {
     public DebtResponse() {
     }
 
-    public DebtResponse(Integer id, Integer amount, String creditor, String creditorName,
+    public DebtResponse(Integer id, BigDecimal amount, String creditor, String creditorName,
                         String debtor, String debtorName, Date dueDate, String status,
                         String priority, boolean isRecurring, String category, String note,
                         String day, String date, Date createdAt, Date updatedAt, User user) {
@@ -57,11 +58,11 @@ public class DebtResponse {
         this.id = id;
     }
 
-    public Integer getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Integer amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 
@@ -125,8 +126,8 @@ public class DebtResponse {
         return isRecurring;
     }
 
-    public boolean setRecurring(boolean isRecurring) {
-        return isRecurring = isRecurring;
+    public void setRecurring(boolean recurring) {
+        isRecurring = recurring;
     }
 
     public String getCategory() {

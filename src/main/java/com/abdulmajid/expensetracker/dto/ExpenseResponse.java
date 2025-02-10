@@ -2,11 +2,12 @@ package com.abdulmajid.expensetracker.dto;
 
 import com.abdulmajid.expensetracker.model.User;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class ExpenseResponse {
     private Integer id;
-    private Integer amount;
+    private BigDecimal amount;
     private String paymentMode;
     private String note;
     private String day;
@@ -20,7 +21,9 @@ public class ExpenseResponse {
     public ExpenseResponse() {
     }
 
-    public ExpenseResponse(Integer id, Integer amount, String paymentMode, String note, String day, String date, Date createdAt, Date updatedAt, ExpenseCategoryResponse category, User user) {
+    public ExpenseResponse(Integer id, BigDecimal amount, String paymentMode, String note,
+                           String day, String date, Date createdAt, Date updatedAt,
+                           ExpenseCategoryResponse category, User user) {
         this.id = id;
         this.amount = amount;
         this.paymentMode = paymentMode;
@@ -41,11 +44,11 @@ public class ExpenseResponse {
         this.id = id;
     }
 
-    public Integer getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Integer amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 

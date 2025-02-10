@@ -2,6 +2,7 @@ package com.abdulmajid.expensetracker.model;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -10,7 +11,7 @@ public class Debt {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private Integer amount;
+    private BigDecimal amount;
     private String creditor; // Who gives the debt is owed to(Credit card,Bank,person)
     private String creditorName; // Who gives the debt is owed to(axis flipkart cc,idfc,bob)
     private String debtor; // Who gives the debt Or A debtor is a company or individual who owes money
@@ -34,7 +35,7 @@ public class Debt {
     public Debt() {
     }
 
-    public Debt(Integer amount, String creditor, String creditorName,
+    public Debt(BigDecimal amount, String creditor, String creditorName,
                 String debtor, String debtorName, Date dueDate, String status,
                 String priority, Boolean isRecurring, String category, String note,
                 String day, String date, Date createdAt, Date updatedAt, User user) {
@@ -64,11 +65,11 @@ public class Debt {
         this.id = id;
     }
 
-    public Integer getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Integer amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 

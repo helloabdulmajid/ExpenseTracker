@@ -15,6 +15,9 @@ import com.abdulmajid.expensetracker.service.ExpenseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.Date;
+
 @Service
 public class ExpenseServiceImpl implements ExpenseService {
 
@@ -41,7 +44,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         Expense expense = new Expense(expenseRequest.getAmount(),
                 expenseRequest.getPaymentMode(),
                 expenseRequest.getNote(),
-                expenseRequest.getDay(),
+                expenseRequest.getDay().toUpperCase(),
                 expenseRequest.getDate(),
                 expenseRequest.getCreatedAt(),
                 expenseRequest.getUpdatedAt(),
@@ -51,6 +54,17 @@ public class ExpenseServiceImpl implements ExpenseService {
 
         // Save the expense in to db
         expenseRepository.save(expense);
+
+        //get Total Expense from user table
+        BigDecimal oldTotalExpense = existsUser.getExpense();
+        BigDecimal newTotalExpense = oldTotalExpense.add(expenseRequest.getAmount());
+
+        //add newTotalExpense in user table
+
+        existsUser.setExpense(newTotalExpense);
+        existsUser.setUpdatedAt(new Date());
+
+        userRepository.save(existsUser);
 
         // Return ExpenseResponse (with category details)
 
@@ -62,4 +76,6 @@ public class ExpenseServiceImpl implements ExpenseService {
                 expense.getUpdatedAt(), expenseCategoryResponse, existsUser);
 
     }
+
+
 }

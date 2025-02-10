@@ -1,20 +1,21 @@
 package com.abdulmajid.expensetracker.dto;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class LoanRequest {
     private Integer id;
-    private Integer amount;
+    private BigDecimal amount;
     private String lender;  // Who provided the loan
     private String borrower; // Optional, if applicable
-    private Double interestRate;
+    private BigDecimal interestRate;
     private String loanType;
     private Integer tenureMonths;
     private Date startDate;
     private Date dueDate;
     private String paymentMode;
     private String isPaid;
-    private Double remainingBalance;
+    private BigDecimal remainingBalance;
     private String status;
     private String note;
     private String day;
@@ -23,9 +24,9 @@ public class LoanRequest {
     public LoanRequest() {
     }
 
-    public LoanRequest(Integer amount, String lender, String borrower, Double interestRate, String loanType,
+    public LoanRequest(BigDecimal amount, String lender, String borrower, BigDecimal interestRate, String loanType,
                        Integer tenureMonths, Date startDate, Date dueDate, String paymentMode, String isPaid,
-                       Double remainingBalance, String status, String note, String day, Date date) {
+                       BigDecimal remainingBalance, String status, String note, String day, Date date) {
         this.amount = amount;
         this.lender = lender;
         this.borrower = borrower;
@@ -51,11 +52,11 @@ public class LoanRequest {
         this.id = id;
     }
 
-    public Integer getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Integer amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 
@@ -75,11 +76,11 @@ public class LoanRequest {
         this.borrower = borrower;
     }
 
-    public Double getInterestRate() {
+    public BigDecimal getInterestRate() {
         return interestRate;
     }
 
-    public void setInterestRate(Double interestRate) {
+    public void setInterestRate(BigDecimal interestRate) {
         this.interestRate = interestRate;
     }
 
@@ -131,11 +132,11 @@ public class LoanRequest {
         this.isPaid = isPaid;
     }
 
-    public Double getRemainingBalance() {
+    public BigDecimal getRemainingBalance() {
         return remainingBalance;
     }
 
-    public void setRemainingBalance(Double remainingBalance) {
+    public void setRemainingBalance(BigDecimal remainingBalance) {
         this.remainingBalance = remainingBalance;
     }
 

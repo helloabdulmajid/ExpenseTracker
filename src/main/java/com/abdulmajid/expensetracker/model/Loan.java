@@ -2,6 +2,7 @@ package com.abdulmajid.expensetracker.model;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -10,17 +11,17 @@ public class Loan {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private Integer amount;
+    private BigDecimal amount;
     private String lender;  // Who provided the loan
     private String borrower; // Optional, if applicable
-    private Double interestRate;
+    private BigDecimal interestRate;
     private String loanType; // e.g., Personal, Business, Education
     private Integer tenureMonths; // Duration in months
     private Date startDate;
     private Date dueDate;
     private String paymentMode; // CASH, BANK_TRANSFER, ONLINE
     private String isPaid;
-    private Double remainingBalance;
+    private BigDecimal remainingBalance;
     private String status; // ACTIVE, PENDING, CLOSED
     private String note;
     private String day;
@@ -39,9 +40,9 @@ public class Loan {
     public Loan() {
     }
 
-    public Loan(Integer amount, String lender, String borrower, Double interestRate, String loanType,
+    public Loan(BigDecimal amount, String lender, String borrower, BigDecimal interestRate, String loanType,
                 Integer tenureMonths, Date startDate, Date dueDate, String paymentMode, String isPaid,
-                Double remainingBalance, String status, String note, String day, Date date, User user) {
+                BigDecimal remainingBalance, String status, String note, String day, Date date, User user) {
         this.amount = amount;
         this.lender = lender;
         this.borrower = borrower;
@@ -68,11 +69,11 @@ public class Loan {
         this.id = id;
     }
 
-    public Integer getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Integer amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 
@@ -92,11 +93,11 @@ public class Loan {
         this.borrower = borrower;
     }
 
-    public Double getInterestRate() {
+    public BigDecimal getInterestRate() {
         return interestRate;
     }
 
-    public void setInterestRate(Double interestRate) {
+    public void setInterestRate(BigDecimal interestRate) {
         this.interestRate = interestRate;
     }
 
@@ -148,11 +149,11 @@ public class Loan {
         this.isPaid = isPaid;
     }
 
-    public Double getRemainingBalance() {
+    public BigDecimal getRemainingBalance() {
         return remainingBalance;
     }
 
-    public void setRemainingBalance(Double remainingBalance) {
+    public void setRemainingBalance(BigDecimal remainingBalance) {
         this.remainingBalance = remainingBalance;
     }
 

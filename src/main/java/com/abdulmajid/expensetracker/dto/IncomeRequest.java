@@ -1,14 +1,25 @@
 package com.abdulmajid.expensetracker.dto;
 
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class IncomeRequest {
     private Integer id;
-    private Integer amount;
+    @NotNull(message = "Amount cannot be null")
+    @DecimalMin(value = "0.01", message = "Amount must be greater than 0") // Prevents negative and zero values
+    private BigDecimal amount;
+    @NotBlank(message = "Source is required")
     private String source;
+    @NotBlank(message = "Receive mode is required")
     private String receiveMode;
     private String note;
+    @NotBlank(message = "Day cannot be empty")
     private String day;
+    @NotBlank(message = "Date cannot be empty")
     private String date;
     private Date createdAt;
     private Date updatedAt;
@@ -17,7 +28,7 @@ public class IncomeRequest {
     public IncomeRequest() {
     }
 
-    public IncomeRequest(Integer id, Integer amount, String source, String receiveMode,
+    public IncomeRequest(Integer id, BigDecimal amount, String source, String receiveMode,
                          String note, String day, String date, Date createdAt,
                          Date updatedAt, Integer userId) {
         this.id = id;
@@ -40,11 +51,11 @@ public class IncomeRequest {
         this.id = id;
     }
 
-    public Integer getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Integer amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 

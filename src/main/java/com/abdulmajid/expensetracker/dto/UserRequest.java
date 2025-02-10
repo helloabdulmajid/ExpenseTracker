@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
@@ -31,10 +32,10 @@ public class UserRequest {
     @NotBlank
     @Size(min = 8, max = 100, message = "Minimum Length of Password is 8")
     private String cPassword;
-    private Integer expense;
-    private Integer income;
-    private String debt;
-    private Integer loan;
+    private BigDecimal expense;
+    private BigDecimal income;
+    private BigDecimal debt;
+    private BigDecimal loan;
     private Date createdAt;
     private Date updatedAt;
 
@@ -86,35 +87,35 @@ public class UserRequest {
         this.cPassword = cPassword;
     }
 
-    public Integer getExpense() {
+    public BigDecimal getExpense() {
         return expense;
     }
 
-    public void setExpense(Integer expense) {
+    public void setExpense(BigDecimal expense) {
         this.expense = expense;
     }
 
-    public Integer getIncome() {
+    public BigDecimal getIncome() {
         return income;
     }
 
-    public void setIncome(Integer income) {
+    public void setIncome(BigDecimal income) {
         this.income = income;
     }
 
-    public String getDebt() {
+    public BigDecimal getDebt() {
         return debt;
     }
 
-    public void setDebt(String debt) {
+    public void setDebt(BigDecimal debt) {
         this.debt = debt;
     }
 
-    public Integer getLoan() {
+    public BigDecimal getLoan() {
         return loan;
     }
 
-    public void setLoan(Integer loan) {
+    public void setLoan(BigDecimal loan) {
         this.loan = loan;
     }
 

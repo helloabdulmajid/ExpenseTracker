@@ -2,6 +2,7 @@ package com.abdulmajid.expensetracker.dto;
 
 import jakarta.validation.constraints.*;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class ExpenseRequest {
@@ -9,7 +10,7 @@ public class ExpenseRequest {
     @NotNull(message = "Amount cannot be Empty")
     @Min(value = 1, message = "Expense Amount should be greater than 0")
     @Max(value = 1000000, message = "Expense Amount should be Lower than 1M")
-    private Integer amount;
+    private BigDecimal amount;
 
     @NotBlank(message = "Please choose a payment mode")
     @Pattern(regexp = "CASH|CARD|UPI", message = "Invalid payment mode. Choose CASH, CARD, or UPI")
@@ -27,7 +28,7 @@ public class ExpenseRequest {
     public ExpenseRequest() {
     }
 
-    public ExpenseRequest(Integer id, Integer amount, String paymentMode, String note, String day,
+    public ExpenseRequest(Integer id, BigDecimal amount, String paymentMode, String note, String day,
                           String date, Date createdAt, Date updatedAt, Integer categoryId,
                           Integer userId) {
         this.id = id;
@@ -50,11 +51,11 @@ public class ExpenseRequest {
         this.id = id;
     }
 
-    public Integer getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Integer amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 

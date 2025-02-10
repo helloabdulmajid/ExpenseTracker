@@ -4,6 +4,7 @@ package com.abdulmajid.expensetracker.model;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -12,7 +13,7 @@ public class Expense {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private Integer amount;
+    private BigDecimal amount;
     private String paymentMode;
     private String note;
     private String day;
@@ -35,7 +36,7 @@ public class Expense {
     }
 
 
-    public Expense(Integer amount, String paymentMode, String note, String day, String date, Date createdAt, Date updatedAt, ExpenseCategory dbExpenseCategory, User existsUser) {
+    public Expense(BigDecimal amount, String paymentMode, String note, String day, String date, Date createdAt, Date updatedAt, ExpenseCategory dbExpenseCategory, User existsUser) {
         this.amount = amount;
         this.paymentMode = paymentMode;
         this.note = note;
@@ -55,11 +56,11 @@ public class Expense {
         this.id = id;
     }
 
-    public Integer getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Integer amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 

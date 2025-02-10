@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -20,10 +21,10 @@ public class UserResponse {
     private String userName;
     private String email;
     private String phone;
-    private Integer expense;
-    private Integer income;
-    private String debt;
-    private Integer loan;
+    private BigDecimal expense;
+    private BigDecimal income;
+    private BigDecimal debt;
+    private BigDecimal loan;
     private Date createdAt;
     private Date updatedAt;
 
@@ -57,7 +58,7 @@ public class UserResponse {
         this.updatedAt = updatedAt;
     }
 
-    public UserResponse(Integer id, String name, String userName, String email, String phone, Integer expense, Integer income, String debt, Integer loan, Date createdAt, Date updatedAt) {
+    public UserResponse(Integer id, String name, String userName, String email, String phone, BigDecimal expense, BigDecimal income, BigDecimal debt, BigDecimal loan, Date createdAt, Date updatedAt) {
         this.id = id;
         this.name = name;
         this.userName = userName;
@@ -111,35 +112,35 @@ public class UserResponse {
         this.phone = phone;
     }
 
-    public Integer getExpense() {
+    public BigDecimal getExpense() {
         return expense;
     }
 
-    public void setExpense(Integer expense) {
+    public void setExpense(BigDecimal expense) {
         this.expense = expense;
     }
 
-    public Integer getIncome() {
+    public BigDecimal getIncome() {
         return income;
     }
 
-    public void setIncome(Integer income) {
+    public void setIncome(BigDecimal income) {
         this.income = income;
     }
 
-    public String getDebt() {
+    public BigDecimal getDebt() {
         return debt;
     }
 
-    public void setDebt(String debt) {
+    public void setDebt(BigDecimal debt) {
         this.debt = debt;
     }
 
-    public Integer getLoan() {
+    public BigDecimal getLoan() {
         return loan;
     }
 
-    public void setLoan(Integer loan) {
+    public void setLoan(BigDecimal loan) {
         this.loan = loan;
     }
 

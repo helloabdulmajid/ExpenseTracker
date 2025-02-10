@@ -10,4 +10,12 @@ public interface IncomeService {
     public IncomeResponse createIncomeForUser(Integer userId, IncomeRequest incomeRequest);
 
     List<Income> getIncomeForUser(Integer userId);
+
+    String updateIncome(Integer userId, Integer incomeId, IncomeRequest incomeRequest);
+
+    IncomeResponse getIncome(Integer incomeId);
+
+    String deleteIncome(Integer userId, Integer incomeId);
+
+    List<IncomeResponse> getAllIncome();
 }

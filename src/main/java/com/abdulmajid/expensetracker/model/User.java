@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -22,10 +23,14 @@ public class User {
     private String email;
     private String password;
     private String phone;
-    private Integer expense;
-    private Integer income;
-    private String debt;
-    private Integer loan;
+    @Column(precision = 10, scale = 2, nullable = false)
+    private BigDecimal expense = BigDecimal.ZERO;
+    @Column(precision = 10, scale = 2, nullable = false)
+    private BigDecimal income = BigDecimal.ZERO;
+    @Column(precision = 10, scale = 2, nullable = false)
+    private BigDecimal debt = BigDecimal.ZERO;
+    @Column(precision = 10, scale = 2, nullable = false)
+    private BigDecimal loan = BigDecimal.ZERO;
     private Date createdAt = new Date();
     private Date updatedAt;
 
@@ -94,35 +99,35 @@ public class User {
         this.phone = phone;
     }
 
-    public Integer getExpense() {
+    public BigDecimal getExpense() {
         return expense;
     }
 
-    public void setExpense(Integer expense) {
+    public void setExpense(BigDecimal expense) {
         this.expense = expense;
     }
 
-    public Integer getIncome() {
+    public BigDecimal getIncome() {
         return income;
     }
 
-    public void setIncome(Integer income) {
+    public void setIncome(BigDecimal income) {
         this.income = income;
     }
 
-    public String getDebt() {
+    public BigDecimal getDebt() {
         return debt;
     }
 
-    public void setDebt(String debt) {
+    public void setDebt(BigDecimal debt) {
         this.debt = debt;
     }
 
-    public Integer getLoan() {
+    public BigDecimal getLoan() {
         return loan;
     }
 
-    public void setLoan(Integer loan) {
+    public void setLoan(BigDecimal loan) {
         this.loan = loan;
     }
 
@@ -138,7 +143,7 @@ public class User {
         return updatedAt;
     }
 
-    public void setUpdated_at(Date updatedAt) {
+    public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
 

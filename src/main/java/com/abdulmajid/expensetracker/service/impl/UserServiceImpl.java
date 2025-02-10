@@ -111,7 +111,7 @@ public class UserServiceImpl implements UserService {
             User user = existsUser.get();
             user.setName(userRequest.getName());
             user.setUserName(userRequest.getUserName());
-            user.setUpdated_at(new Date());
+            user.setUpdatedAt(new Date());
             return new UserResponse(Optional.of(user));
         }
         throw new UserNotFoundException("User With ID " + userId + " is Not Found");
