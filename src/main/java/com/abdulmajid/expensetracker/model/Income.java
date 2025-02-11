@@ -1,5 +1,6 @@
 package com.abdulmajid.expensetracker.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -13,13 +14,17 @@ public class Income {
     private Integer id;
     @Column(precision = 10, scale = 2)
     private BigDecimal amount;
-    private String sourceCategory;
     private String receiveMode;
     private String note;
     private String day;
     private String date;
     private Date createdAt;
     private Date updatedAt;
+
+    @JsonManagedReference
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    private IncomeCategory incomeCategory;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -29,16 +34,16 @@ public class Income {
     }
 
     // this use for create only
-    public Income(BigDecimal amount, String sourceCategory, String receiveMode,
-                  String note, String day, String date, User user) {
+    public Income(BigDecimal amount, String receiveMode,
+                  String note, String day, String date, IncomeCategory incomeCategory, User user) {
         this.amount = amount;
-        this.sourceCategory = sourceCategory;
         this.receiveMode = receiveMode;
         this.note = note;
         this.day = day;
         this.date = date;
         this.createdAt = new Date();
         this.updatedAt = new Date();
+        this.incomeCategory = incomeCategory;
         this.user = user;
     }
 
@@ -58,12 +63,12 @@ public class Income {
         this.amount = amount;
     }
 
-    public String getSourceCategory() {
-        return sourceCategory;
+    public IncomeCategory getIncomeCategory() {
+        return incomeCategory;
     }
 
-    public void setSourceCategory(String sourceCategory) {
-        this.sourceCategory = sourceCategory;
+    public void setIncomeCategory(IncomeCategory incomeCategory) {
+        this.incomeCategory = incomeCategory;
     }
 
     public String getReceiveMode() {

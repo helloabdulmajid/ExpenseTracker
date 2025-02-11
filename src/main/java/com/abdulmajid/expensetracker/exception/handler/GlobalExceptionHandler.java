@@ -1,9 +1,6 @@
 package com.abdulmajid.expensetracker.exception.handler;
 
-import com.abdulmajid.expensetracker.exception.custom.CategoryNotFoundException;
-import com.abdulmajid.expensetracker.exception.custom.IncomeNotFoundException;
-import com.abdulmajid.expensetracker.exception.custom.InvalidArgumentException;
-import com.abdulmajid.expensetracker.exception.custom.UserNotFoundException;
+import com.abdulmajid.expensetracker.exception.custom.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -29,6 +26,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IncomeNotFoundException.class)
     public ResponseEntity<String> handleIncomeNotFoundException(IncomeNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(ExpenseNotFoundException.class)
+    public ResponseEntity<String> handleExpenseNotFoundException(ExpenseNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 

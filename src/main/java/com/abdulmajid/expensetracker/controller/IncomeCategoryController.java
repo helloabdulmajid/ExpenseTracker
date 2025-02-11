@@ -24,6 +24,7 @@ public class IncomeCategoryController {
         return ResponseEntity.ok("Income Category added successfully!");
     }
 
+    //fix this only cateroy return not user
     @GetMapping("/categories/{userId}")
     public List<IncomeCategory> getCategoriesForUser(@PathVariable Integer userId) {
         return incomeCategoryService.getIncomeCategoriesForUser(userId);
@@ -33,4 +34,6 @@ public class IncomeCategoryController {
     public List<IncomeCategoryResponse> getAllCategories() {
         return incomeCategoryService.getAllCategories();
     }
+
+    //add another one here  getAllIncomeCategoryWithAllUser
 }

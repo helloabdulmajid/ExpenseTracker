@@ -112,6 +112,7 @@ public class UserServiceImpl implements UserService {
             user.setName(userRequest.getName());
             user.setUserName(userRequest.getUserName());
             user.setUpdatedAt(new Date());
+            userRepository.save(user);
             return new UserResponse(Optional.of(user));
         }
         throw new UserNotFoundException("User With ID " + userId + " is Not Found");

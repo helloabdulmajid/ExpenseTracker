@@ -2,7 +2,6 @@ package com.abdulmajid.expensetracker.controller;
 
 import com.abdulmajid.expensetracker.dto.IncomeRequest;
 import com.abdulmajid.expensetracker.dto.IncomeResponse;
-import com.abdulmajid.expensetracker.model.Income;
 import com.abdulmajid.expensetracker.service.IncomeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -22,8 +21,8 @@ public class IncomeController {
     }
 
     @GetMapping("/user/{userId}")
-    public List<Income> getIncomeForUser(@PathVariable Integer userId) {
-        return incomeService.getIncomeForUser(userId);
+    public List<IncomeResponse> getAllIncomeForUser(@PathVariable Integer userId) {
+        return incomeService.getAllIncomeForUser(userId);
     }
 
     @GetMapping("/{incomeId}")

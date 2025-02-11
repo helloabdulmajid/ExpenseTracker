@@ -13,7 +13,7 @@ public class IncomeRequest {
     @DecimalMin(value = "0.01", message = "Amount must be greater than 0") // Prevents negative and zero values
     private BigDecimal amount;
     @NotBlank(message = "Source is required")
-    private String source;
+    private Integer categoryId;
     @NotBlank(message = "Receive mode is required")
     private String receiveMode;
     private String note;
@@ -28,12 +28,12 @@ public class IncomeRequest {
     public IncomeRequest() {
     }
 
-    public IncomeRequest(Integer id, BigDecimal amount, String source, String receiveMode,
+    public IncomeRequest(Integer id, BigDecimal amount, Integer categoryId, String receiveMode,
                          String note, String day, String date, Date createdAt,
                          Date updatedAt, Integer userId) {
         this.id = id;
         this.amount = amount;
-        this.source = source;
+        this.categoryId = categoryId;
         this.receiveMode = receiveMode;
         this.note = note;
         this.day = day;
@@ -59,12 +59,12 @@ public class IncomeRequest {
         this.amount = amount;
     }
 
-    public String getSource() {
-        return source;
+    public Integer getCategoryId() {
+        return categoryId;
     }
 
-    public void setSource(String source) {
-        this.source = source;
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
     }
 
     public String getReceiveMode() {

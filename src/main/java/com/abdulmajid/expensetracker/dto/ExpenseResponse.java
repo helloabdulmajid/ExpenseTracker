@@ -36,6 +36,20 @@ public class ExpenseResponse {
         this.user = user;
     }
 
+    public ExpenseResponse(Integer id, BigDecimal amount, String paymentMode, String note,
+                           String day, String date, Date createdAt, Date updatedAt,
+                           ExpenseCategoryResponse category) {
+        this.id = id;
+        this.amount = amount;
+        this.paymentMode = paymentMode;
+        this.note = note;
+        this.day = day;
+        this.date = date;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.category = category;
+    }
+
     public Integer getId() {
         return id;
     }

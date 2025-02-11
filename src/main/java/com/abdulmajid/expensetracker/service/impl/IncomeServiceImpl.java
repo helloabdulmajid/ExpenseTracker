@@ -1,13 +1,16 @@
 package com.abdulmajid.expensetracker.service.impl;
 
+import com.abdulmajid.expensetracker.dto.IncomeCategoryResponse;
 import com.abdulmajid.expensetracker.dto.IncomeRequest;
 import com.abdulmajid.expensetracker.dto.IncomeResponse;
+import com.abdulmajid.expensetracker.exception.custom.CategoryNotFoundException;
 import com.abdulmajid.expensetracker.exception.custom.IncomeNotFoundException;
 import com.abdulmajid.expensetracker.exception.custom.UserNotFoundException;
-import com.abdulmajid.expensetracker.model.ExpenseCategory;
 import com.abdulmajid.expensetracker.model.Income;
+import com.abdulmajid.expensetracker.model.IncomeCategory;
 import com.abdulmajid.expensetracker.model.User;
 import com.abdulmajid.expensetracker.repository.ExpenseCategoryRepository;
+import com.abdulmajid.expensetracker.repository.IncomeCategoryRepository;
 import com.abdulmajid.expensetracker.repository.IncomeRepository;
 import com.abdulmajid.expensetracker.repository.UserRepository;
 import com.abdulmajid.expensetracker.service.IncomeService;
@@ -30,6 +33,9 @@ public class IncomeServiceImpl implements IncomeService {
     @Autowired
     private ExpenseCategoryRepository expenseCategoryRepository;
 
+    @Autowired
+    private IncomeCategoryRepository incomeCategoryRepository;
+
     @Override
     public IncomeResponse createIncomeForUser(Integer userId, IncomeRequest incomeRequest) {
 
@@ -38,14 +44,14 @@ public class IncomeServiceImpl implements IncomeService {
                 .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
 
 
-        //get category from source
-        ExpenseCategory dbExpenseCategory = expenseCategoryRepository.findByCategoryName(incomeRequest.getSource());
+        //get category from id
+        IncomeCategory dbIncomeCategory = incomeCategoryRepository.findById(incomeRequest.getCategoryId())
+                .orElseThrow(() -> new CategoryNotFoundException("Income Category not found "));
 
 
-        // save source as a string in source income table
-        Income income = new Income(incomeRequest.getAmount(), incomeRequest.getSource(),
-                incomeRequest.getReceiveMode(), incomeRequest.getNote(), incomeRequest.getDay(),
-                incomeRequest.getDate(), existsUser);
+        Income income = new Income(incomeRequest.getAmount(), incomeRequest.getReceiveMode(),
+                incomeRequest.getNote(), incomeRequest.getDay(),
+                incomeRequest.getDate(), dbIncomeCategory, existsUser);
 
         Income saveIncome = incomeRepository.save(income);
 
@@ -59,34 +65,54 @@ public class IncomeServiceImpl implements IncomeService {
         existsUser.setUpdatedAt(new Date());
 
         userRepository.save(existsUser);
+        IncomeCategoryResponse incomeCategoryResponse = new IncomeCategoryResponse(dbIncomeCategory.getId(),
+                dbIncomeCategory.getCategoryName(), dbIncomeCategory.isDefaultCategory());
 
         return new IncomeResponse(saveIncome.getId(), saveIncome.getAmount(),
-                saveIncome.getSourceCategory(), saveIncome.getReceiveMode(), saveIncome.getNote(),
+                saveIncome.getReceiveMode(), saveIncome.getNote(),
                 saveIncome.getDay(), saveIncome.getDate(), saveIncome.getCreatedAt(),
-                saveIncome.getUpdatedAt(), saveIncome.getUser());
+                saveIncome.getUpdatedAt(), incomeCategoryResponse, saveIncome.getUser());
 
     }
 
     @Override
-    public List<Income> getIncomeForUser(Integer userId) {
+    public List<IncomeResponse> getAllIncomeForUser(Integer userId) {
 
         // get user from userId(param)
         User existsUser = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
 
+        List<Income> userIncomeList = incomeRepository.findByUserId(userId);
 
-        return incomeRepository.findByUserId(userId);
+        ArrayList<IncomeResponse> incomeResponses = new ArrayList<>();
+        for (Income income : userIncomeList) {
+            IncomeResponse incomeResponse = new IncomeResponse(income.getId(), income.getAmount(),
+                    income.getReceiveMode(), income.getNote(), income.getDay(), income.getDate(),
+                    income.getCreatedAt(), income.getUpdatedAt(),
+                    new IncomeCategoryResponse(income.getIncomeCategory().getId(),
+                            income.getIncomeCategory().getCategoryName(),
+                            income.getIncomeCategory().isDefaultCategory()));
+            incomeResponses.add(incomeResponse);
+        }
+        return incomeResponses;
     }
 
     @Override
     public IncomeResponse getIncome(Integer incomeId) {
-        Income existingIncome = incomeRepository.findById(incomeId)
+        Income existsIncome = incomeRepository.findById(incomeId)
                 .orElseThrow(() -> new IncomeNotFoundException("Income Not found with Income Id:  " + incomeId));
 
-        return new IncomeResponse(existingIncome.getId(), existingIncome.getAmount(),
-                existingIncome.getSourceCategory(), existingIncome.getReceiveMode(), existingIncome.getNote(),
-                existingIncome.getDay(), existingIncome.getDate(), existingIncome.getCreatedAt(),
-                existingIncome.getUpdatedAt());
+        //get category from existsIncome
+        IncomeCategory dbIncomeCategory = incomeCategoryRepository.findById(existsIncome.getIncomeCategory().getId())
+                .orElseThrow(() -> new CategoryNotFoundException("Income Category not found "));
+
+        IncomeCategoryResponse incomeCategoryResponse = new IncomeCategoryResponse(dbIncomeCategory.getId(),
+                dbIncomeCategory.getCategoryName(), dbIncomeCategory.isDefaultCategory());
+
+        return new IncomeResponse(existsIncome.getId(), existsIncome.getAmount(),
+                existsIncome.getReceiveMode(), existsIncome.getNote(),
+                existsIncome.getDay(), existsIncome.getDate(), existsIncome.getCreatedAt(),
+                existsIncome.getUpdatedAt(), incomeCategoryResponse, existsIncome.getUser());
 
     }
 
@@ -95,9 +121,12 @@ public class IncomeServiceImpl implements IncomeService {
         List<Income> allIncome = incomeRepository.findAll();
         ArrayList<IncomeResponse> incomeResponses = new ArrayList<>();
         for (Income income : allIncome) {
-            IncomeResponse incomeResponse = new IncomeResponse(income.getId(), income.getAmount(), income.getSourceCategory(),
+            IncomeResponse incomeResponse = new IncomeResponse(income.getId(), income.getAmount(),
                     income.getReceiveMode(), income.getNote(), income.getDay(), income.getDate(),
-                    income.getCreatedAt(), income.getUpdatedAt());
+                    income.getCreatedAt(), income.getUpdatedAt(),
+                    new IncomeCategoryResponse(income.getIncomeCategory().getId(),
+                            income.getIncomeCategory().getCategoryName(),
+                            income.getIncomeCategory().isDefaultCategory()));
             incomeResponses.add(incomeResponse);
         }
         return incomeResponses;
@@ -119,9 +148,13 @@ public class IncomeServiceImpl implements IncomeService {
         BigDecimal oldAmount = existsIncome.getAmount();
         BigDecimal newAmount = incomeRequest.getAmount();
 
+        IncomeCategory dbIncomeCategory = incomeCategoryRepository.findById(existsIncome.getIncomeCategory().getId())
+                .orElseThrow(() -> new CategoryNotFoundException("Income Category not found "));
+
+
         // If new amount is the same as old, just update the income all records and return
         if (newAmount.compareTo(oldAmount) == 0) {
-            existsIncome.setSourceCategory(incomeRequest.getSource());
+            existsIncome.setIncomeCategory(dbIncomeCategory);
             existsIncome.setNote(incomeRequest.getNote());
             existsIncome.setUpdatedAt(new Date());
 
@@ -147,7 +180,7 @@ public class IncomeServiceImpl implements IncomeService {
 
         // Update the income record
         existsIncome.setAmount(newAmount);
-        existsIncome.setSourceCategory(incomeRequest.getSource());
+        existsIncome.setIncomeCategory(dbIncomeCategory);
         existsIncome.setNote(incomeRequest.getNote());
         existsIncome.setUpdatedAt(new Date());
 

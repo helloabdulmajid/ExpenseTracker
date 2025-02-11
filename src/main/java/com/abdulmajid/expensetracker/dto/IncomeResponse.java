@@ -8,7 +8,7 @@ import java.util.Date;
 public class IncomeResponse {
     private Integer id;
     private BigDecimal amount;
-    private String source;
+    // private String source;
     private String receiveMode;
     private String note;
     private String day;
@@ -16,35 +16,39 @@ public class IncomeResponse {
     private Date createdAt;
     private Date updatedAt;
     private User user;
+    private IncomeCategoryResponse incomeCategoryResponse;
 
     public IncomeResponse() {
     }
 
-    public IncomeResponse(Integer id, BigDecimal amount, String source, String receiveMode,
-                          String note, String day, String date, Date createdAt, Date updatedAt, User user) {
+    public IncomeResponse(Integer id, BigDecimal amount, String receiveMode,
+                          String note, String day, String date, Date createdAt, Date updatedAt,
+                          IncomeCategoryResponse incomeCategoryResponse, User user) {
         this.id = id;
         this.amount = amount;
-        this.source = source;
         this.receiveMode = receiveMode;
         this.note = note;
         this.day = day;
         this.date = date;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.incomeCategoryResponse = incomeCategoryResponse;
         this.user = user;
     }
 
-    public IncomeResponse(Integer id, BigDecimal amount, String source, String receiveMode,
-                          String note, String day, String date, Date createdAt, Date updatedAt) {
+    public IncomeResponse(Integer id, BigDecimal amount, String receiveMode,
+                          String note, String day, String date, Date createdAt, Date updatedAt,
+                          IncomeCategoryResponse incomeCategoryResponse) {
         this.id = id;
         this.amount = amount;
-        this.source = source;
         this.receiveMode = receiveMode;
         this.note = note;
         this.day = day;
         this.date = date;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.incomeCategoryResponse = incomeCategoryResponse;
+
     }
 
     public Integer getId() {
@@ -63,12 +67,12 @@ public class IncomeResponse {
         this.amount = amount;
     }
 
-    public String getSource() {
-        return source;
+    public IncomeCategoryResponse getIncomeCategoryResponse() {
+        return incomeCategoryResponse;
     }
 
-    public void setSource(String source) {
-        this.source = source;
+    public void setIncomeCategoryResponse(IncomeCategoryResponse incomeCategoryResponse) {
+        this.incomeCategoryResponse = incomeCategoryResponse;
     }
 
     public String getReceiveMode() {
