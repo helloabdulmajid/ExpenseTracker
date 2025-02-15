@@ -9,4 +9,12 @@ public interface DebtService {
     DebtResponse createDebtForUser(Integer userId, DebtRequest debtRequest);
 
     List<DebtResponse> getAllDebtForUser(Integer userId);
+
+    DebtResponse getDebt(Integer debtId);
+
+    List<DebtResponse> getAllDebt();
+
+    String updateDebt(Integer userId, Integer debtId, DebtRequest debtRequest);
+
+    String deleteDebt(Integer userId, Integer debtId);
 }

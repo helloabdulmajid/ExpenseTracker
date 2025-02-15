@@ -2,7 +2,6 @@ package com.abdulmajid.expensetracker.controller;
 
 import com.abdulmajid.expensetracker.dto.ExpenseRequest;
 import com.abdulmajid.expensetracker.dto.ExpenseResponse;
-import com.abdulmajid.expensetracker.model.Expense;
 import com.abdulmajid.expensetracker.service.ExpenseService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +24,7 @@ public class ExpenseController {
     }
 
     @GetMapping("/user/{userId}")
-    public List<Expense> getExpenseForUser(@PathVariable Integer userId) {
+    public List<ExpenseResponse> getExpenseForUser(@PathVariable Integer userId) {
         return expenseService.getExpenseForUser(userId);
     }
 

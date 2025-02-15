@@ -11,4 +11,10 @@ public interface LoanService {
     List<LoanResponse> getAllLoanForUser(Integer userId);
 
     LoanResponse getOneLoan(Integer loanId);
+
+    List<LoanResponse> getAllLoans();
+
+    String updateLoan(Integer userId, Integer loanId, LoanRequest loanRequest);
+
+    String deleteLoan(Integer userId, Integer loanId);
 }

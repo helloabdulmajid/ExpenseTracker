@@ -1,8 +1,12 @@
 package com.abdulmajid.expensetracker.dto;
 
+import com.abdulmajid.expensetracker.enums.LoanStatus;
+import com.abdulmajid.expensetracker.enums.LoanType;
+import com.abdulmajid.expensetracker.enums.PaymentMode;
 import com.abdulmajid.expensetracker.model.User;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
 import java.util.Date;
 
 public class LoanResponse {
@@ -11,16 +15,16 @@ public class LoanResponse {
     private String lender;  // Who provided the loan
     private String borrower; // Optional, if applicable
     private BigDecimal interestRate;
-    private String loanType;
+    private LoanType loanType;
     private Integer tenureMonths;
     private Date startDate;
     private Date dueDate;
-    private String paymentMode;
+    private PaymentMode paymentMode;
     private String isPaid;
     private BigDecimal remainingBalance;
-    private String status;
+    private LoanStatus status;
     private String note;
-    private String day;
+    private DayOfWeek day;
     private Date date;
     private Date createdAt;
     private Date updatedAt;
@@ -30,9 +34,9 @@ public class LoanResponse {
     }
 
     public LoanResponse(Integer id, BigDecimal amount, String lender, String borrower, BigDecimal interestRate,
-                        String loanType, Integer tenureMonths, Date startDate, Date dueDate,
-                        String paymentMode, String isPaid, BigDecimal remainingBalance, String status,
-                        String note, String day, Date date, Date createdAt, Date updatedAt, User user) {
+                        LoanType loanType, Integer tenureMonths, Date startDate, Date dueDate,
+                        PaymentMode paymentMode, String isPaid, BigDecimal remainingBalance, LoanStatus status,
+                        String note, DayOfWeek day, Date date, Date createdAt, Date updatedAt, User user) {
         this.id = id;
         this.amount = amount;
         this.lender = lender;
@@ -52,6 +56,31 @@ public class LoanResponse {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.user = user;
+    }
+
+    public LoanResponse(Integer id, BigDecimal amount, String lender, String borrower, BigDecimal interestRate,
+                        LoanType loanType, Integer tenureMonths, Date startDate, Date dueDate,
+                        PaymentMode paymentMode, String isPaid, BigDecimal remainingBalance,
+                        LoanStatus status, String note, DayOfWeek day, Date date, Date createdAt,
+                        Date updatedAt) {
+        this.id = id;
+        this.amount = amount;
+        this.lender = lender;
+        this.borrower = borrower;
+        this.interestRate = interestRate;
+        this.loanType = loanType;
+        this.tenureMonths = tenureMonths;
+        this.startDate = startDate;
+        this.dueDate = dueDate;
+        this.paymentMode = paymentMode;
+        this.isPaid = isPaid;
+        this.remainingBalance = remainingBalance;
+        this.status = status;
+        this.note = note;
+        this.day = day;
+        this.date = date;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     public Integer getId() {
@@ -94,11 +123,11 @@ public class LoanResponse {
         this.interestRate = interestRate;
     }
 
-    public String getLoanType() {
+    public LoanType getLoanType() {
         return loanType;
     }
 
-    public void setLoanType(String loanType) {
+    public void setLoanType(LoanType loanType) {
         this.loanType = loanType;
     }
 
@@ -126,11 +155,11 @@ public class LoanResponse {
         this.dueDate = dueDate;
     }
 
-    public String getPaymentMode() {
+    public PaymentMode getPaymentMode() {
         return paymentMode;
     }
 
-    public void setPaymentMode(String paymentMode) {
+    public void setPaymentMode(PaymentMode paymentMode) {
         this.paymentMode = paymentMode;
     }
 
@@ -150,11 +179,11 @@ public class LoanResponse {
         this.remainingBalance = remainingBalance;
     }
 
-    public String getStatus() {
+    public LoanStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(LoanStatus status) {
         this.status = status;
     }
 
@@ -166,11 +195,11 @@ public class LoanResponse {
         this.note = note;
     }
 
-    public String getDay() {
+    public DayOfWeek getDay() {
         return day;
     }
 
-    public void setDay(String day) {
+    public void setDay(DayOfWeek day) {
         this.day = day;
     }
 

@@ -117,4 +117,20 @@ public class UserServiceImpl implements UserService {
         }
         throw new UserNotFoundException("User With ID " + userId + " is Not Found");
     }
+
+    @Override
+    public String deleteUser(Integer userId) {
+
+        User existsUser = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+        try {
+            // Remove income record
+            userRepository.delete(existsUser);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "Deleted Income Id : -> " + userId;
+
+        // not finis delete work now, also delete this user relete expense,income,etc...
+    }
 }

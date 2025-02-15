@@ -1,8 +1,12 @@
 package com.abdulmajid.expensetracker.model;
 
+import com.abdulmajid.expensetracker.enums.LoanStatus;
+import com.abdulmajid.expensetracker.enums.LoanType;
+import com.abdulmajid.expensetracker.enums.PaymentMode;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
 import java.util.Date;
 
 @Entity
@@ -15,16 +19,20 @@ public class Loan {
     private String lender;  // Who provided the loan
     private String borrower; // Optional, if applicable
     private BigDecimal interestRate;
-    private String loanType; // e.g., Personal, Business, Education
+    @Enumerated(EnumType.STRING)
+    private LoanType loanType; // e.g., Personal, Business, Education
     private Integer tenureMonths; // Duration in months
     private Date startDate;
     private Date dueDate;
-    private String paymentMode; // CASH, BANK_TRANSFER, ONLINE
+    @Enumerated(EnumType.STRING)
+    private PaymentMode paymentMode; // CASH, BANK_TRANSFER, ONLINE
     private String isPaid;
     private BigDecimal remainingBalance;
-    private String status; // ACTIVE, PENDING, CLOSED
+    @Enumerated(EnumType.STRING)
+    private LoanStatus status; // ACTIVE, PENDING, CLOSED
     private String note;
-    private String day;
+    @Enumerated(EnumType.STRING)
+    private DayOfWeek day;
     private Date date;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -40,9 +48,9 @@ public class Loan {
     public Loan() {
     }
 
-    public Loan(BigDecimal amount, String lender, String borrower, BigDecimal interestRate, String loanType,
-                Integer tenureMonths, Date startDate, Date dueDate, String paymentMode, String isPaid,
-                BigDecimal remainingBalance, String status, String note, String day, Date date, User user) {
+    public Loan(BigDecimal amount, String lender, String borrower, BigDecimal interestRate, LoanType loanType,
+                Integer tenureMonths, Date startDate, Date dueDate, PaymentMode paymentMode, String isPaid,
+                BigDecimal remainingBalance, LoanStatus status, String note, DayOfWeek day, Date date, User user) {
         this.amount = amount;
         this.lender = lender;
         this.borrower = borrower;
@@ -101,11 +109,11 @@ public class Loan {
         this.interestRate = interestRate;
     }
 
-    public String getLoanType() {
+    public LoanType getLoanType() {
         return loanType;
     }
 
-    public void setLoanType(String loanType) {
+    public void setLoanType(LoanType loanType) {
         this.loanType = loanType;
     }
 
@@ -133,11 +141,11 @@ public class Loan {
         this.dueDate = dueDate;
     }
 
-    public String getPaymentMode() {
+    public PaymentMode getPaymentMode() {
         return paymentMode;
     }
 
-    public void setPaymentMode(String paymentMode) {
+    public void setPaymentMode(PaymentMode paymentMode) {
         this.paymentMode = paymentMode;
     }
 
@@ -157,11 +165,11 @@ public class Loan {
         this.remainingBalance = remainingBalance;
     }
 
-    public String getStatus() {
+    public LoanStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(LoanStatus status) {
         this.status = status;
     }
 
@@ -173,11 +181,11 @@ public class Loan {
         this.note = note;
     }
 
-    public String getDay() {
+    public DayOfWeek getDay() {
         return day;
     }
 
-    public void setDay(String day) {
+    public void setDay(DayOfWeek day) {
         this.day = day;
     }
 

@@ -19,7 +19,6 @@ public class Debt {
     private Date dueDate;
     private String status; // OUTSTANDING, PAID, OVERDUE
     private String priority; // HIGH, MEDIUM, LOW
-    @Column(columnDefinition = "BOOLEAN") // not working now
     private Boolean isRecurring; // True for recurring debts like credit card emi
     private String category; // Medical, Utility, Credit Card
     private String note;
@@ -38,7 +37,7 @@ public class Debt {
     public Debt(BigDecimal amount, String creditor, String creditorName,
                 String debtor, String debtorName, Date dueDate, String status,
                 String priority, Boolean isRecurring, String category, String note,
-                String day, String date, Date createdAt, Date updatedAt, User user) {
+                String day, String date, User user) {
         this.amount = amount;
         this.creditor = creditor;
         this.creditorName = creditorName;
@@ -129,7 +128,8 @@ public class Debt {
         this.priority = priority;
     }
 
-    public Boolean isRecurring() {
+
+    public Boolean getRecurring() {
         return isRecurring;
     }
 

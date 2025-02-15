@@ -26,8 +26,29 @@ public class LoanController {
         return loanService.getOneLoan(loanId);
     }
 
-    @GetMapping("/getloans/{userId}")
+    @GetMapping("/getloans/user/{userId}")
     public List<LoanResponse> getAllLoanForUser(@PathVariable Integer userId) {
         return loanService.getAllLoanForUser(userId);
+    }
+
+    @GetMapping("/all")
+    public List<LoanResponse> getAllLoans() {
+        return loanService.getAllLoans();
+    }
+
+    @PutMapping("/update/user/{userId}/loan/{loanId}")
+    public String updateLoan(
+            @PathVariable Integer userId,
+            @PathVariable Integer loanId,
+            @RequestBody LoanRequest loanRequest) {
+
+        return loanService.updateLoan(userId, loanId, loanRequest);
+
+    }
+
+    @DeleteMapping("/delete/user/{userId}/loan/{loanId}")
+    public String deleteLoan(@PathVariable Integer userId,
+                             @PathVariable Integer loanId) {
+        return loanService.deleteLoan(userId, loanId);
     }
 }

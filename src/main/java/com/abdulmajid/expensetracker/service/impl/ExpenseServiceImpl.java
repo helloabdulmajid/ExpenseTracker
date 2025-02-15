@@ -81,11 +81,24 @@ public class ExpenseServiceImpl implements ExpenseService {
     }
 
     @Override
-    public List<Expense> getExpenseForUser(Integer userId) {
+    public List<ExpenseResponse> getExpenseForUser(Integer userId) {
         User existsUser = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
 
-        return expenseRepository.findByUserId(userId);
+        List<Expense> expenseList = expenseRepository.findByUserId(userId);
+        ArrayList<ExpenseResponse> expenseResponses = new ArrayList<>();
+
+        for (Expense expense : expenseList) {
+            ExpenseResponse expenseResponse = new ExpenseResponse(expense.getId(), expense.getAmount(),
+                    expense.getPaymentMode(), expense.getNote(), expense.getDay(), expense.getDate(),
+                    expense.getCreatedAt(), expense.getUpdatedAt(),
+                    new ExpenseCategoryResponse(expense.getCategory().getId(),
+                            expense.getCategory().getCategoryName(),
+                            expense.getCategory().isDefaultCategory()));
+
+            expenseResponses.add(expenseResponse);
+        }
+        return expenseResponses;
     }
 
     @Override
@@ -125,12 +138,81 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public String updateExpense(Integer userId, Integer expenseId, ExpenseRequest expenseRequest) {
-        return "";
+
+        User existsUser = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+
+        //get Expense from expenseId
+        Expense existsExpense = expenseRepository.findById(expenseId)
+                .orElseThrow(() -> new ExpenseNotFoundException("Expense Not found with Expense Id:  " + expenseId));
+
+        BigDecimal oldAmount = existsExpense.getAmount();
+        BigDecimal newAmount = expenseRequest.getAmount();
+
+        ExpenseCategory dbExpenseCategory = expenseCategoryRepository.findById(existsExpense.getCategory().getId())
+                .orElseThrow(() -> new CategoryNotFoundException("Expense Category not found " + existsExpense.getCategory().getId()));
+
+
+        // If new amount is the same as old, just update the Expense all records and return
+        if (newAmount.compareTo(oldAmount) == 0) {
+            existsExpense.setCategory(dbExpenseCategory);
+            existsExpense.setNote(expenseRequest.getNote());
+            existsExpense.setUpdatedAt(new Date());
+
+            expenseRepository.save(existsExpense);
+            return "Expense Updated SuccessFully , Expense Id :" + expenseId; //  Exit the function early (no need to update user's Expense)
+        }
+
+        // if NewAmount is greater than old Amount → Add the difference to user table
+
+        if (newAmount.compareTo(oldAmount) > 0) {
+            BigDecimal difference = newAmount.subtract(oldAmount);
+            existsUser.setExpense(existsUser.getExpense().add(difference));
+        } else {
+            // if New amount is smaller → Subtract the difference
+            BigDecimal difference = oldAmount.subtract(newAmount);
+
+            if (existsUser.getExpense().subtract(difference).compareTo(BigDecimal.ZERO) < 0) {
+                throw new ExpenseNotFoundException("Not enough balance to update this Expense");
+            }
+
+            existsUser.setExpense(existsUser.getExpense().subtract(difference));
+        }
+
+        // Update the Expense record
+        existsExpense.setAmount(newAmount);
+        existsExpense.setCategory(dbExpenseCategory);
+        existsExpense.setNote(expenseRequest.getNote());
+        existsExpense.setUpdatedAt(new Date());
+
+        // Save updates
+        expenseRepository.save(existsExpense);
+        existsUser.setUpdatedAt(new Date());
+        userRepository.save(existsUser);
+
+        return "Expense Updated SuccessFully , Expense Id :" + expenseId;
     }
 
     @Override
     public String deleteExpense(Integer userId, Integer expenseId) {
-        return "";
+        User existsUser = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+
+        Expense existsExpense = expenseRepository.findById(expenseId)
+                .orElseThrow(() -> new ExpenseNotFoundException("Expense Not found with Expense Id:  " + expenseId));
+
+        BigDecimal expenseAmount = existsExpense.getAmount();
+
+        try {
+            existsUser.setExpense(existsUser.getExpense().subtract(expenseAmount));
+
+            // Remove Expense record
+            expenseRepository.delete(existsExpense);
+            userRepository.save(existsUser);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "Deleted Expense Id : -> " + expenseId;
     }
 
 

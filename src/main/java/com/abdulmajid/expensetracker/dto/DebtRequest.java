@@ -13,7 +13,7 @@ public class DebtRequest {
     private Date dueDate;
     private String status; // OUTSTANDING, PAID, OVERDUE
     private String priority; // HIGH, MEDIUM, LOW
-    private boolean isRecurring; // True for recurring debts like credit card emi
+    private Boolean isRecurring; // True for recurring debts like credit card emi
     private String category; // Medical, Utility, Credit Card
     private String note;
     private String day;
@@ -26,7 +26,7 @@ public class DebtRequest {
 
     public DebtRequest(BigDecimal amount, String creditor, String creditorName, String debtor,
                        String debtorName, Date dueDate, String status, String priority,
-                       boolean isRecurring, String category, String note, String day, String date) {
+                       Boolean isRecurring, String category, String note, String day, String date) {
         this.amount = amount;
         this.creditor = creditor;
         this.creditorName = creditorName;
@@ -116,11 +116,11 @@ public class DebtRequest {
         this.priority = priority;
     }
 
-    public boolean isRecurring() {
+    public Boolean getRecurring() {
         return isRecurring;
     }
 
-    public void setRecurring(boolean recurring) {
+    public void setRecurring(Boolean recurring) {
         isRecurring = recurring;
     }
 

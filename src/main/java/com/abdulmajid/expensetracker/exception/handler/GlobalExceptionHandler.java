@@ -34,6 +34,22 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
+    @ExceptionHandler(DebtNotFoundException.class)
+    public ResponseEntity<String> handleDebtNotFoundException(DebtNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(LoanNotFoundException.class)
+    public ResponseEntity<String> handleLoanNotFoundException(LoanNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidEnumException.class)
+    public ResponseEntity<String> handleInvalidEnumException(InvalidEnumException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleGlobalException(Exception ex) {
         ex.printStackTrace(); // Log the full stack trace for debugging

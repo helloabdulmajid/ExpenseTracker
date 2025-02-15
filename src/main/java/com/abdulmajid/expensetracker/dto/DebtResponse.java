@@ -15,7 +15,7 @@ public class DebtResponse {
     private Date dueDate;
     private String status;
     private String priority;
-    private boolean isRecurring;
+    private Boolean isRecurring;
     private String category;
     private String note;
     private String day;
@@ -29,7 +29,7 @@ public class DebtResponse {
 
     public DebtResponse(Integer id, BigDecimal amount, String creditor, String creditorName,
                         String debtor, String debtorName, Date dueDate, String status,
-                        String priority, boolean isRecurring, String category, String note,
+                        String priority, Boolean isRecurring, String category, String note,
                         String day, String date, Date createdAt, Date updatedAt, User user) {
         this.id = id;
         this.amount = amount;
@@ -48,6 +48,11 @@ public class DebtResponse {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.user = user;
+    }
+
+    public DebtResponse(Integer id, BigDecimal amount, String creditor, String creditorName, String debtor, String debtorName,
+                        Date dueDate, String status, String priority, Boolean recurring, String category, String note,
+                        String day, String date, Date createdAt, Date updatedAt) {
     }
 
     public Integer getId() {
@@ -122,11 +127,11 @@ public class DebtResponse {
         this.priority = priority;
     }
 
-    public boolean isRecurring() {
+    public Boolean getRecurring() {
         return isRecurring;
     }
 
-    public void setRecurring(boolean recurring) {
+    public void setRecurring(Boolean recurring) {
         isRecurring = recurring;
     }
 

@@ -20,13 +20,36 @@ public class DebtController {
                                           @RequestBody DebtRequest debtRequest) {
         return debtService.createDebtForUser(userId, debtRequest);
     }
-//    @GetMapping("/{userId}")
-//    public Debt getDebtForUser(@PathVariable Integer userId) {
-//        return debtService.getDebtForUser(userId);
-//    }
 
-    @GetMapping("/{userId}")
+    @GetMapping("/user/{userId}")
     public List<DebtResponse> getAllDebtForUser(@PathVariable Integer userId) {
         return debtService.getAllDebtForUser(userId);
     }
+
+    @GetMapping("/{debtId}")
+    public DebtResponse getDebt(@PathVariable Integer debtId) {
+        return debtService.getDebt(debtId);
+    }
+
+    @GetMapping("/all")
+    public List<DebtResponse> getAllDebt() {
+        return debtService.getAllDebt();
+    }
+
+    @PutMapping("/update/user/{userId}/debt/{debtId}")
+    public String updateDebt(
+            @PathVariable Integer userId,
+            @PathVariable Integer debtId,
+            @RequestBody DebtRequest debtRequest) {
+
+        return debtService.updateDebt(userId, debtId, debtRequest);
+
+    }
+
+    @DeleteMapping("/delete/user/{userId}/debt/{debtId}")
+    public String deleteDebt(@PathVariable Integer userId,
+                             @PathVariable Integer debtId) {
+        return debtService.deleteDebt(userId, debtId);
+    }
+
 }
