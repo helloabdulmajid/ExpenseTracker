@@ -22,7 +22,12 @@ public class ExpenseRequest {
     private String date;
     private Date createdAt;
     private Date updatedAt;
+    @NotNull(message = "Category ID is required")
+    @Min(value = 1, message = "Category ID must be a positive number")
     private Integer categoryId;
+
+    @NotNull(message = "User ID is required")
+    @Min(value = 1, message = "User ID must be a positive number")
     private Integer userId;
 
     public ExpenseRequest() {

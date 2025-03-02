@@ -1,6 +1,7 @@
 package com.abdulmajid.expensetracker.dto;
 
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -12,8 +13,6 @@ public class IncomeRequest {
     @NotNull(message = "Amount cannot be null")
     @DecimalMin(value = "0.01", message = "Amount must be greater than 0") // Prevents negative and zero values
     private BigDecimal amount;
-    @NotBlank(message = "Source is required")
-    private Integer categoryId;
     @NotBlank(message = "Receive mode is required")
     private String receiveMode;
     private String note;
@@ -23,6 +22,13 @@ public class IncomeRequest {
     private String date;
     private Date createdAt;
     private Date updatedAt;
+
+    @NotNull(message = "Source ID is required")
+    @Min(value = 1, message = "Category ID must be a positive number")
+    private Integer categoryId;
+
+    @NotNull(message = "User ID is required")
+    @Min(value = 1, message = "User ID must be a positive number")
     private Integer userId;
 
     public IncomeRequest() {

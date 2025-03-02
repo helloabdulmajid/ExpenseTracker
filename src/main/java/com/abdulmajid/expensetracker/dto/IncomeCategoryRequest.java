@@ -1,7 +1,11 @@
 package com.abdulmajid.expensetracker.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class IncomeCategoryRequest {
     private Integer id;
+
+    @NotBlank(message = "Category Name  is required")
     private String categoryName; // Only required field in request
 
     public IncomeCategoryRequest() {

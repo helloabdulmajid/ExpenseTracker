@@ -1,23 +1,54 @@
 package com.abdulmajid.expensetracker.dto;
 
+import jakarta.validation.constraints.*;
+
 import java.math.BigDecimal;
 import java.util.Date;
 
 public class DebtRequest {
     private Integer id;
+
+    @NotNull(message = "Amount cannot be null")
+    @DecimalMin(value = "0.01", message = "Amount must be greater than zero")
     private BigDecimal amount;
-    private String creditor; // Who gives the debt is owed to(Credit card,Bank,person)
-    private String creditorName; // Who gives the debt is owed to(axis flipkart cc,idfc,bob)
-    private String debtor; // Who gives the debt Or A debtor is a company or individual who owes money
-    private String debtorName;   // Name of that debtor
+
+    @NotBlank(message = "Creditor is required")
+    private String creditor; // Who gives the debt (Credit card, Bank, Person)
+
+    @NotBlank(message = "Creditor name is required")
+    private String creditorName; // Example: Axis Flipkart CC, IDFC, BOB
+
+    @NotBlank(message = "Debtor is required")
+    private String debtor; // Who owes the debt
+
+    @NotBlank(message = "Debtor name is required")
+    private String debtorName; // Name of the debtor
+
+    @NotNull(message = "Due date is required")
+    @FutureOrPresent(message = "Due date must be today or in the future")
     private Date dueDate;
+
+    @NotBlank(message = "Status is required")
+    @Pattern(regexp = "OUTSTANDING|PAID|OVERDUE", message = "Status must be OUTSTANDING, PAID, or OVERDUE")
     private String status; // OUTSTANDING, PAID, OVERDUE
+
+    @NotBlank(message = "Priority is required")
+    @Pattern(regexp = "HIGH|MEDIUM|LOW", message = "Priority must be HIGH, MEDIUM, or LOW")
     private String priority; // HIGH, MEDIUM, LOW
-    private Boolean isRecurring; // True for recurring debts like credit card emi
-    private String category; // Medical, Utility, Credit Card
-    private String note;
-    private String day;
-    private String date;
+
+    @NotNull(message = "Recurring flag is required")
+    private Boolean isRecurring; // True for recurring debts like credit card EMI
+
+    @NotBlank(message = "Category is required")
+    private String category; // Medical, Utility, Credit Card, etc.
+
+    private String note; // Optional
+
+    @NotBlank(message = "Day is required")
+    private String day; // Example: Monday, Tuesday, etc.
+
+    @NotBlank(message = "Date is required")
+    private String date; // Example: "2024-03-02"
     private Date createdAt;
     private Date updatedAt;
 
