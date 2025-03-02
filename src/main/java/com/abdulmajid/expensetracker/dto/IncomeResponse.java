@@ -3,6 +3,7 @@ package com.abdulmajid.expensetracker.dto;
 import com.abdulmajid.expensetracker.model.User;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Date;
 
 public class IncomeResponse {
@@ -12,7 +13,7 @@ public class IncomeResponse {
     private String receiveMode;
     private String note;
     private String day;
-    private String date;
+    private LocalDate date;
     private Date createdAt;
     private Date updatedAt;
     private User user;
@@ -22,7 +23,7 @@ public class IncomeResponse {
     }
 
     public IncomeResponse(Integer id, BigDecimal amount, String receiveMode,
-                          String note, String day, String date, Date createdAt, Date updatedAt,
+                          String note, String day, LocalDate date, Date createdAt, Date updatedAt,
                           IncomeCategoryResponse incomeCategoryResponse, User user) {
         this.id = id;
         this.amount = amount;
@@ -37,7 +38,7 @@ public class IncomeResponse {
     }
 
     public IncomeResponse(Integer id, BigDecimal amount, String receiveMode,
-                          String note, String day, String date, Date createdAt, Date updatedAt,
+                          String note, String day, LocalDate date, Date createdAt, Date updatedAt,
                           IncomeCategoryResponse incomeCategoryResponse) {
         this.id = id;
         this.amount = amount;
@@ -67,14 +68,6 @@ public class IncomeResponse {
         this.amount = amount;
     }
 
-    public IncomeCategoryResponse getIncomeCategoryResponse() {
-        return incomeCategoryResponse;
-    }
-
-    public void setIncomeCategoryResponse(IncomeCategoryResponse incomeCategoryResponse) {
-        this.incomeCategoryResponse = incomeCategoryResponse;
-    }
-
     public String getReceiveMode() {
         return receiveMode;
     }
@@ -99,11 +92,11 @@ public class IncomeResponse {
         this.day = day;
     }
 
-    public String getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
@@ -129,5 +122,13 @@ public class IncomeResponse {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public IncomeCategoryResponse getIncomeCategoryResponse() {
+        return incomeCategoryResponse;
+    }
+
+    public void setIncomeCategoryResponse(IncomeCategoryResponse incomeCategoryResponse) {
+        this.incomeCategoryResponse = incomeCategoryResponse;
     }
 }

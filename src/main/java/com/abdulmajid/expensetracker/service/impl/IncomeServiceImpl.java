@@ -14,6 +14,7 @@ import com.abdulmajid.expensetracker.repository.IncomeCategoryRepository;
 import com.abdulmajid.expensetracker.repository.IncomeRepository;
 import com.abdulmajid.expensetracker.repository.UserRepository;
 import com.abdulmajid.expensetracker.service.IncomeService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,7 +38,7 @@ public class IncomeServiceImpl implements IncomeService {
     private IncomeCategoryRepository incomeCategoryRepository;
 
     @Override
-    public IncomeResponse createIncomeForUser(Integer userId, IncomeRequest incomeRequest) {
+    public IncomeResponse createIncomeForUser(@Valid Integer userId, IncomeRequest incomeRequest) {
 
         // get user from userId(param)
         User existsUser = userRepository.findById(userId)

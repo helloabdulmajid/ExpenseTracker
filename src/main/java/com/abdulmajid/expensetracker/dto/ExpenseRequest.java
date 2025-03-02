@@ -3,6 +3,7 @@ package com.abdulmajid.expensetracker.dto;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Date;
 
 public class ExpenseRequest {
@@ -18,23 +19,22 @@ public class ExpenseRequest {
     private String note;
     @NotBlank(message = "Day cannot be empty")
     private String day;
-    @NotBlank(message = "Date cannot be empty")
-    private String date;
+    @PastOrPresent(message = "Date cannot be in the future")
+    @NotNull(message = "Date cannot be null")
+    private LocalDate date;
     private Date createdAt;
     private Date updatedAt;
     @NotNull(message = "Category ID is required")
     @Min(value = 1, message = "Category ID must be a positive number")
     private Integer categoryId;
 
-    @NotNull(message = "User ID is required")
-    @Min(value = 1, message = "User ID must be a positive number")
     private Integer userId;
 
     public ExpenseRequest() {
     }
 
     public ExpenseRequest(Integer id, BigDecimal amount, String paymentMode, String note, String day,
-                          String date, Date createdAt, Date updatedAt, Integer categoryId,
+                          LocalDate date, Date createdAt, Date updatedAt, Integer categoryId,
                           Integer userId) {
         this.id = id;
         this.amount = amount;
@@ -88,11 +88,11 @@ public class ExpenseRequest {
         this.day = day;
     }
 
-    public String getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 

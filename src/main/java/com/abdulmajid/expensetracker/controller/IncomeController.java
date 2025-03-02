@@ -3,6 +3,7 @@ package com.abdulmajid.expensetracker.controller;
 import com.abdulmajid.expensetracker.dto.IncomeRequest;
 import com.abdulmajid.expensetracker.dto.IncomeResponse;
 import com.abdulmajid.expensetracker.service.IncomeService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +16,7 @@ public class IncomeController {
     private IncomeService incomeService;
 
     @PostMapping("/create/{userId}")
-    public IncomeResponse createIncomeForUser(@PathVariable Integer userId,
+    public IncomeResponse createIncomeForUser(@Valid @PathVariable Integer userId,
                                               @RequestBody IncomeRequest incomeRequest) {
         return incomeService.createIncomeForUser(userId, incomeRequest);
     }

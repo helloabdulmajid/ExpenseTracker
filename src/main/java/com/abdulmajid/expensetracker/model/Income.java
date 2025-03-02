@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -17,7 +18,9 @@ public class Income {
     private String receiveMode;
     private String note;
     private String day;
-    private String date;
+    @Column(name = "date", nullable = false)
+    @Temporal(TemporalType.DATE) // Store as DATE type
+    private LocalDate date;
     private Date createdAt;
     private Date updatedAt;
 
@@ -35,7 +38,7 @@ public class Income {
 
     // this use for create only
     public Income(BigDecimal amount, String receiveMode,
-                  String note, String day, String date, IncomeCategory incomeCategory, User user) {
+                  String note, String day, LocalDate date, IncomeCategory incomeCategory, User user) {
         this.amount = amount;
         this.receiveMode = receiveMode;
         this.note = note;
@@ -63,14 +66,6 @@ public class Income {
         this.amount = amount;
     }
 
-    public IncomeCategory getIncomeCategory() {
-        return incomeCategory;
-    }
-
-    public void setIncomeCategory(IncomeCategory incomeCategory) {
-        this.incomeCategory = incomeCategory;
-    }
-
     public String getReceiveMode() {
         return receiveMode;
     }
@@ -95,11 +90,11 @@ public class Income {
         this.day = day;
     }
 
-    public String getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
@@ -117,6 +112,14 @@ public class Income {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public IncomeCategory getIncomeCategory() {
+        return incomeCategory;
+    }
+
+    public void setIncomeCategory(IncomeCategory incomeCategory) {
+        this.incomeCategory = incomeCategory;
     }
 
     public User getUser() {

@@ -1,11 +1,9 @@
 package com.abdulmajid.expensetracker.dto;
 
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Date;
 
 public class IncomeRequest {
@@ -18,8 +16,9 @@ public class IncomeRequest {
     private String note;
     @NotBlank(message = "Day cannot be empty")
     private String day;
-    @NotBlank(message = "Date cannot be empty")
-    private String date;
+    @PastOrPresent(message = "Date cannot be in the future")
+    @NotNull(message = "Date cannot be null")
+    private LocalDate date;
     private Date createdAt;
     private Date updatedAt;
 
@@ -27,15 +26,13 @@ public class IncomeRequest {
     @Min(value = 1, message = "Category ID must be a positive number")
     private Integer categoryId;
 
-    @NotNull(message = "User ID is required")
-    @Min(value = 1, message = "User ID must be a positive number")
     private Integer userId;
 
     public IncomeRequest() {
     }
 
     public IncomeRequest(Integer id, BigDecimal amount, Integer categoryId, String receiveMode,
-                         String note, String day, String date, Date createdAt,
+                         String note, String day, LocalDate date, Date createdAt,
                          Date updatedAt, Integer userId) {
         this.id = id;
         this.amount = amount;
@@ -65,14 +62,6 @@ public class IncomeRequest {
         this.amount = amount;
     }
 
-    public Integer getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(Integer categoryId) {
-        this.categoryId = categoryId;
-    }
-
     public String getReceiveMode() {
         return receiveMode;
     }
@@ -97,11 +86,11 @@ public class IncomeRequest {
         this.day = day;
     }
 
-    public String getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
@@ -119,6 +108,14 @@ public class IncomeRequest {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public Integer getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
     }
 
     public Integer getUserId() {

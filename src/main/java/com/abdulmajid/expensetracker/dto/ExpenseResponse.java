@@ -3,6 +3,7 @@ package com.abdulmajid.expensetracker.dto;
 import com.abdulmajid.expensetracker.model.User;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Date;
 
 public class ExpenseResponse {
@@ -11,7 +12,7 @@ public class ExpenseResponse {
     private String paymentMode;
     private String note;
     private String day;
-    private String date;
+    private LocalDate date;
     private Date createdAt;
     private Date updatedAt;
 
@@ -22,7 +23,7 @@ public class ExpenseResponse {
     }
 
     public ExpenseResponse(Integer id, BigDecimal amount, String paymentMode, String note,
-                           String day, String date, Date createdAt, Date updatedAt,
+                           String day, LocalDate date, Date createdAt, Date updatedAt,
                            ExpenseCategoryResponse category, User user) {
         this.id = id;
         this.amount = amount;
@@ -37,7 +38,7 @@ public class ExpenseResponse {
     }
 
     public ExpenseResponse(Integer id, BigDecimal amount, String paymentMode, String note,
-                           String day, String date, Date createdAt, Date updatedAt,
+                           String day, LocalDate date, Date createdAt, Date updatedAt,
                            ExpenseCategoryResponse category) {
         this.id = id;
         this.amount = amount;
@@ -90,11 +91,11 @@ public class ExpenseResponse {
         this.day = day;
     }
 
-    public String getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 

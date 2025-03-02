@@ -17,9 +17,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ExpenseServiceImpl implements ExpenseService {
@@ -213,6 +216,102 @@ public class ExpenseServiceImpl implements ExpenseService {
             e.printStackTrace();
         }
         return "Deleted Expense Id : -> " + expenseId;
+    }
+
+    @Override
+    public List<ExpenseResponse> getMonthlyExpenses(Integer userId, Integer month) {
+        User existsUser = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+
+        LocalDate firstDay = LocalDate.of(LocalDate.now().getYear(), month, 1);
+        LocalDate lastDay = firstDay.withDayOfMonth(firstDay.lengthOfMonth());
+
+        List<Expense> expenses = expenseRepository.findByUserIdAndDateBetween(userId, firstDay, lastDay);
+        if (expenses.isEmpty()) {
+            throw new ExpenseNotFoundException("Expenses not found for the given Month.");
+        }
+        return expenses.stream()
+                .map(expense -> new ExpenseResponse(
+                        expense.getId(),
+                        expense.getAmount(),
+                        expense.getPaymentMode(),
+                        expense.getNote(),
+                        expense.getDay(),
+                        expense.getDate(),
+                        expense.getCreatedAt(),
+                        expense.getUpdatedAt(),
+                        new ExpenseCategoryResponse(
+                                expense.getCategory().getId(),
+                                expense.getCategory().getCategoryName(),
+                                expense.getCategory().isDefaultCategory()
+                        )
+                ))
+                .collect(Collectors.toList());
+
+    }
+
+    @Override
+    public List<ExpenseResponse> getWeeklyExpenses(Integer userId, Integer week) {
+        User existsUser = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+
+        LocalDate today = LocalDate.now();
+        LocalDate firstDayOfYear = LocalDate.of(today.getYear(), 1, 1);
+
+        // Find start and end date of the week
+        LocalDate startOfWeek = firstDayOfYear.plusWeeks(week - 1).with(DayOfWeek.MONDAY);
+        LocalDate endOfWeek = startOfWeek.plusDays(6);
+
+        List<Expense> expenses = expenseRepository.findByUserIdAndDateBetween(userId, startOfWeek, endOfWeek);
+        if (expenses.isEmpty()) {
+            throw new ExpenseNotFoundException("Expenses not found for the given Month.");
+        }
+        return expenses.stream()
+                .map(expense -> new ExpenseResponse(
+                        expense.getId(),
+                        expense.getAmount(),
+                        expense.getPaymentMode(),
+                        expense.getNote(),
+                        expense.getDay(),
+                        expense.getDate(),
+                        expense.getCreatedAt(),
+                        expense.getUpdatedAt(),
+                        new ExpenseCategoryResponse(
+                                expense.getCategory().getId(),
+                                expense.getCategory().getCategoryName(),
+                                expense.getCategory().isDefaultCategory()
+                        )
+                ))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ExpenseResponse> getDailyExpenses(Integer userId, LocalDate day) {
+        User existsUser = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+
+        List<Expense> expenses = expenseRepository.findByUserIdAndDate(userId, day);
+
+        if (expenses.isEmpty()) {
+            throw new ExpenseNotFoundException("Expenses not found for the given Day.");
+        }
+        return expenses.stream()
+                .map(expense -> new ExpenseResponse(
+                        expense.getId(),
+                        expense.getAmount(),
+                        expense.getPaymentMode(),
+                        expense.getNote(),
+                        expense.getDay(),
+                        expense.getDate(),
+                        expense.getCreatedAt(),
+                        expense.getUpdatedAt(),
+                        new ExpenseCategoryResponse(
+                                expense.getCategory().getId(),
+                                expense.getCategory().getCategoryName(),
+                                expense.getCategory().isDefaultCategory()
+                        )
+                ))
+                .collect(Collectors.toList());
     }
 
 

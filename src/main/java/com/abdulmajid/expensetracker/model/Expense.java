@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -17,7 +18,7 @@ public class Expense {
     private String paymentMode;
     private String note;
     private String day;
-    private String date;
+    private LocalDate date;
     private Date createdAt;
     private Date updatedAt;
 
@@ -36,7 +37,7 @@ public class Expense {
     }
 
 
-    public Expense(BigDecimal amount, String paymentMode, String note, String day, String date, Date createdAt, Date updatedAt, ExpenseCategory dbExpenseCategory, User existsUser) {
+    public Expense(BigDecimal amount, String paymentMode, String note, String day, LocalDate date, Date createdAt, Date updatedAt, ExpenseCategory dbExpenseCategory, User existsUser) {
         this.amount = amount;
         this.paymentMode = paymentMode;
         this.note = note;
@@ -88,11 +89,11 @@ public class Expense {
         this.day = day;
     }
 
-    public String getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
