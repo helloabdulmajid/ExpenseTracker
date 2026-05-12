@@ -8,6 +8,7 @@ import com.abdulmajid.expensetracker.model.User;
 import com.abdulmajid.expensetracker.repository.UserRepository;
 import com.abdulmajid.expensetracker.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,12 +19,11 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     // CREATE USER
     @Override
-    public UserResponse createUser(
-            UserRequest userRequest
-    ) {
+    public UserResponse createUser(UserRequest userRequest) {
 
         validateUserRequest(userRequest);
 
@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
                 userRequest.getName(),
                 userRequest.getUserName(),
                 userRequest.getEmail(),
-                userRequest.getPassword(),
+                passwordEncoder.encode(userRequest.getPassword()),
                 userRequest.getPhone()
         );
 
