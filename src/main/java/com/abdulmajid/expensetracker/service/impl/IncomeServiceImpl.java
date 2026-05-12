@@ -30,19 +30,11 @@ public class IncomeServiceImpl implements IncomeService {
 
     // CREATE INCOME
     @Override
-    public IncomeResponse createIncomeForUser(
-
-            Integer userId,
-
-            IncomeRequest incomeRequest
-    ) {
+    public IncomeResponse createIncomeForUser(Integer userId, IncomeRequest incomeRequest) {
 
         User user = getUserById(userId);
 
-        IncomeCategory incomeCategory =
-                getIncomeCategoryById(
-                        incomeRequest.getCategoryId()
-                );
+        IncomeCategory incomeCategory = getIncomeCategoryById(incomeRequest.getCategoryId());
 
         Income income = new Income(
                 incomeRequest.getAmount(),
@@ -53,8 +45,7 @@ public class IncomeServiceImpl implements IncomeService {
                 user
         );
 
-        Income savedIncome =
-                incomeRepository.save(income);
+        Income savedIncome = incomeRepository.save(income);
 
         return mapToResponse(savedIncome);
     }
@@ -165,9 +156,7 @@ public class IncomeServiceImpl implements IncomeService {
     }
 
     // HELPER METHOD
-    private User getUserById(
-            Integer userId
-    ) {
+    private User getUserById(Integer userId) {
 
         return userRepository.findById(userId)
                 .orElseThrow(() ->
@@ -178,9 +167,7 @@ public class IncomeServiceImpl implements IncomeService {
     }
 
     // HELPER METHOD
-    private IncomeCategory getIncomeCategoryById(
-            Integer categoryId
-    ) {
+    private IncomeCategory getIncomeCategoryById(Integer categoryId) {
 
         return incomeCategoryRepository.findById(categoryId)
                 .orElseThrow(() ->
@@ -192,12 +179,7 @@ public class IncomeServiceImpl implements IncomeService {
     }
 
     // HELPER METHOD
-    private Income getIncomeByIdAndUserId(
-
-            Integer incomeId,
-
-            Integer userId
-    ) {
+    private Income getIncomeByIdAndUserId(Integer incomeId, Integer userId) {
 
         return incomeRepository.findByIdAndUserId(
                         incomeId,
@@ -213,12 +195,9 @@ public class IncomeServiceImpl implements IncomeService {
 
 
     // MAPPER METHOD
-    private IncomeResponse mapToResponse(
-            Income income
-    ) {
+    private IncomeResponse mapToResponse(Income income) {
 
-        IncomeResponse response =
-                new IncomeResponse();
+        IncomeResponse response = new IncomeResponse();
 
         response.setId(
                 income.getId()

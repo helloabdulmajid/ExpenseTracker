@@ -3,56 +3,181 @@ package com.abdulmajid.expensetracker.exception.handler;
 import com.abdulmajid.expensetracker.exception.custom.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@ControllerAdvice
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestControllerAdvice
+
 public class GlobalExceptionHandler {
 
+    // VALIDATION ERRORS
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>>
+    handleValidationExceptions(
+            MethodArgumentNotValidException ex
+    ) {
+
+        Map<String, String> errors =
+                new HashMap<>();
+
+        for (FieldError error :
+                ex.getBindingResult().getFieldErrors()) {
+
+            errors.put(
+                    error.getField(),
+                    error.getDefaultMessage()
+            );
+        }
+
+        return ResponseEntity
+                .badRequest()
+                .body(errors);
+    }
+
+    // USER NOT FOUND
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    public ResponseEntity<ApiErrorResponse>
+    handleUserNotFoundException(
+            UserNotFoundException ex
+    ) {
+
+        return buildErrorResponse(
+                HttpStatus.NOT_FOUND,
+                ex.getMessage()
+        );
     }
 
-    @ExceptionHandler(InvalidArgumentException.class)
-    public ResponseEntity<String> handleInvalidArgumentException(InvalidArgumentException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-    }
-
+    // CATEGORY ERROR
     @ExceptionHandler(CategoryNotFoundException.class)
-    public ResponseEntity<String> handleCategoryNotFoundException(CategoryNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    public ResponseEntity<ApiErrorResponse>
+    handleCategoryException(
+            CategoryNotFoundException ex
+    ) {
+
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                ex.getMessage()
+        );
     }
 
-    @ExceptionHandler(IncomeNotFoundException.class)
-    public ResponseEntity<String> handleIncomeNotFoundException(IncomeNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-    }
-
+    // EXPENSE ERROR
     @ExceptionHandler(ExpenseNotFoundException.class)
-    public ResponseEntity<String> handleExpenseNotFoundException(ExpenseNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    public ResponseEntity<ApiErrorResponse>
+    handleExpenseException(
+            ExpenseNotFoundException ex
+    ) {
+
+        return buildErrorResponse(
+                HttpStatus.NOT_FOUND,
+                ex.getMessage()
+        );
     }
 
+    // INCOME ERROR
+    @ExceptionHandler(IncomeNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse>
+    handleIncomeException(
+            IncomeNotFoundException ex
+    ) {
+
+        return buildErrorResponse(
+                HttpStatus.NOT_FOUND,
+                ex.getMessage()
+        );
+    }
+
+    // DEBT ERROR
     @ExceptionHandler(DebtNotFoundException.class)
-    public ResponseEntity<String> handleDebtNotFoundException(DebtNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    public ResponseEntity<ApiErrorResponse>
+    handleDebtException(
+            DebtNotFoundException ex
+    ) {
+
+        return buildErrorResponse(
+                HttpStatus.NOT_FOUND,
+                ex.getMessage()
+        );
     }
 
+    // LOAN ERROR
     @ExceptionHandler(LoanNotFoundException.class)
-    public ResponseEntity<String> handleLoanNotFoundException(LoanNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    public ResponseEntity<ApiErrorResponse>
+    handleLoanException(
+            LoanNotFoundException ex
+    ) {
+
+        return buildErrorResponse(
+                HttpStatus.NOT_FOUND,
+                ex.getMessage()
+        );
     }
 
+    // ENUM ERROR
     @ExceptionHandler(InvalidEnumException.class)
-    public ResponseEntity<String> handleInvalidEnumException(InvalidEnumException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    public ResponseEntity<ApiErrorResponse>
+    handleEnumException(
+            InvalidEnumException ex
+    ) {
+
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                ex.getMessage()
+        );
     }
 
+    // INVALID ARGUMENT
+    @ExceptionHandler(InvalidArgumentException.class)
+    public ResponseEntity<ApiErrorResponse>
+    handleInvalidArgumentException(
+            InvalidArgumentException ex
+    ) {
 
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                ex.getMessage()
+        );
+    }
+
+    // GLOBAL ERROR
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleGlobalException(Exception ex) {
-        ex.printStackTrace(); // Log the full stack trace for debugging
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong. Please try again later.");
+    public ResponseEntity<ApiErrorResponse>
+    handleGlobalException(
+            Exception ex
+    ) {
+
+        ex.printStackTrace();
+
+        return buildErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Something went wrong. Please try again later."
+        );
+    }
+
+    // COMMON BUILDER METHOD
+    private ResponseEntity<ApiErrorResponse>
+    buildErrorResponse(
+
+            HttpStatus status,
+
+            String message
+    ) {
+
+        ApiErrorResponse errorResponse =
+                new ApiErrorResponse(
+                        LocalDateTime.now(),
+                        status.value(),
+                        status.getReasonPhrase(),
+                        message
+                );
+
+        return ResponseEntity
+                .status(status)
+                .body(errorResponse);
     }
 }
