@@ -1,54 +1,99 @@
 package com.abdulmajid.expensetracker.controller;
 
-import com.abdulmajid.expensetracker.dto.LoanRequest;
-import com.abdulmajid.expensetracker.dto.LoanResponse;
+import com.abdulmajid.expensetracker.dto.request.LoanRequest;
+import com.abdulmajid.expensetracker.dto.response.LoanResponse;
 import com.abdulmajid.expensetracker.service.LoanService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("loan")
+@RequestMapping("/users/{userId}/loans")
+
+@RequiredArgsConstructor
+
 public class LoanController {
 
-    @Autowired
-    private LoanService loanService;
+    private final LoanService loanService;
 
-    @PostMapping("/create/{userId}")
-    public LoanResponse createLoanForUser(@PathVariable Integer userId,
-                                          @RequestBody LoanRequest loanRequest) {
-        return loanService.createLoanForUser(userId, loanRequest);
-    }
+    // CREATE LOAN
+    @PostMapping
+    public ResponseEntity<LoanResponse> createLoanForUser(
 
-    @GetMapping("/getloan/{loanId}")
-    public LoanResponse getOneloan(@PathVariable Integer loanId) {
-        return loanService.getOneLoan(loanId);
-    }
-
-    @GetMapping("/getloans/user/{userId}")
-    public List<LoanResponse> getAllLoanForUser(@PathVariable Integer userId) {
-        return loanService.getAllLoanForUser(userId);
-    }
-
-    @GetMapping("/all")
-    public List<LoanResponse> getAllLoans() {
-        return loanService.getAllLoans();
-    }
-
-    @PutMapping("/update/user/{userId}/loan/{loanId}")
-    public String updateLoan(
             @PathVariable Integer userId,
-            @PathVariable Integer loanId,
-            @RequestBody LoanRequest loanRequest) {
 
-        return loanService.updateLoan(userId, loanId, loanRequest);
+            @Valid @RequestBody LoanRequest loanRequest
+    ) {
 
+        LoanResponse response =
+                loanService.createLoanForUser(userId, loanRequest);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
     }
 
-    @DeleteMapping("/delete/user/{userId}/loan/{loanId}")
-    public String deleteLoan(@PathVariable Integer userId,
-                             @PathVariable Integer loanId) {
-        return loanService.deleteLoan(userId, loanId);
+    // GET ALL USER LOANS
+    @GetMapping
+    public ResponseEntity<List<LoanResponse>> getAllLoanForUser(
+
+            @PathVariable Integer userId
+    ) {
+
+        return ResponseEntity.ok(
+                loanService.getAllLoanForUser(userId)
+        );
+    }
+
+    // GET SINGLE LOAN
+    @GetMapping("/{loanId}")
+    public ResponseEntity<LoanResponse> getOneLoan(
+
+            @PathVariable Integer userId,
+
+            @PathVariable Integer loanId
+    ) {
+
+        return ResponseEntity.ok(
+                loanService.getOneLoan(userId, loanId)
+        );
+    }
+
+    // UPDATE LOAN
+    @PutMapping("/{loanId}")
+    public ResponseEntity<LoanResponse> updateLoan(
+
+            @PathVariable Integer userId,
+
+            @PathVariable Integer loanId,
+
+            @Valid @RequestBody LoanRequest loanRequest
+    ) {
+
+        return ResponseEntity.ok(
+                loanService.updateLoan(
+                        userId,
+                        loanId,
+                        loanRequest
+                )
+        );
+    }
+
+    // DELETE LOAN
+    @DeleteMapping("/{loanId}")
+    public ResponseEntity<Void> deleteLoan(
+
+            @PathVariable Integer userId,
+
+            @PathVariable Integer loanId
+    ) {
+
+        loanService.deleteLoan(userId, loanId);
+
+        return ResponseEntity.noContent().build();
     }
 }

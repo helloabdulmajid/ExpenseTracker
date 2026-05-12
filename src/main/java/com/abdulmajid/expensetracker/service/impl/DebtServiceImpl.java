@@ -1,7 +1,7 @@
 package com.abdulmajid.expensetracker.service.impl;
 
-import com.abdulmajid.expensetracker.dto.DebtRequest;
-import com.abdulmajid.expensetracker.dto.DebtResponse;
+import com.abdulmajid.expensetracker.dto.request.DebtRequest;
+import com.abdulmajid.expensetracker.dto.response.DebtResponse;
 import com.abdulmajid.expensetracker.exception.custom.DebtNotFoundException;
 import com.abdulmajid.expensetracker.exception.custom.UserNotFoundException;
 import com.abdulmajid.expensetracker.model.Debt;
@@ -9,217 +9,195 @@ import com.abdulmajid.expensetracker.model.User;
 import com.abdulmajid.expensetracker.repository.DebtRepository;
 import com.abdulmajid.expensetracker.repository.UserRepository;
 import com.abdulmajid.expensetracker.service.DebtService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
+
 public class DebtServiceImpl implements DebtService {
-    @Autowired
-    private DebtRepository debtRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final DebtRepository debtRepository;
 
+    private final UserRepository userRepository;
+
+    // CREATE DEBT
     @Override
-    public DebtResponse createDebtForUser(Integer userId, DebtRequest debtRequest) {
+    public DebtResponse createDebtForUser(
 
-        // get user from userId(param)
-        User existsUser = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+            Integer userId,
 
-        Debt debt = new Debt(debtRequest.getAmount(), debtRequest.getCreditor(),
-                debtRequest.getCreditorName(), debtRequest.getDebtor(),
-                debtRequest.getDebtorName(), debtRequest.getDueDate(),
-                debtRequest.getStatus(), debtRequest.getPriority(),
-                debtRequest.getRecurring(), debtRequest.getCategory(),
-                debtRequest.getNote(), debtRequest.getDay(), debtRequest.getDate(), existsUser);
+            DebtRequest debtRequest
+    ) {
 
-        Debt saveDebt = debtRepository.save(debt);
+        User user = getUserById(userId);
 
-        //get Total Debt from user table
-        BigDecimal oldTotalDebt = existsUser.getDebt();
-        BigDecimal newTotalDebt = oldTotalDebt.add(debtRequest.getAmount());
+        Debt debt = new Debt(
+                debtRequest.getAmount(),
+                debtRequest.getCreditor(),
+                debtRequest.getCreditorName(),
+                debtRequest.getDebtor(),
+                debtRequest.getDebtorName(),
+                debtRequest.getDueDate(),
+                debtRequest.getStatus(),
+                debtRequest.getPriority(),
+                debtRequest.getRecurring(),
+                debtRequest.getCategory(),
+                debtRequest.getNote(),
+                debtRequest.getDate(),
+                user
+        );
 
-        //add newTotalDebt in user table
+        Debt savedDebt = debtRepository.save(debt);
 
-        existsUser.setDebt(newTotalDebt);
-        existsUser.setUpdatedAt(new Date());
-        userRepository.save(existsUser);
-
-        return new DebtResponse(saveDebt.getId(), saveDebt.getAmount(), saveDebt.getCreditor(),
-                saveDebt.getCreditorName(), saveDebt.getDebtor(), saveDebt.getDebtorName(),
-                saveDebt.getDueDate(), saveDebt.getStatus(), saveDebt.getPriority(),
-                saveDebt.getRecurring(), saveDebt.getCategory(), saveDebt.getNote(),
-                saveDebt.getDay(), saveDebt.getDate(), saveDebt.getCreatedAt(),
-                saveDebt.getUpdatedAt(), saveDebt.getUser());
-
+        return mapToResponse(savedDebt);
     }
 
+    // GET ALL USER DEBTS
     @Override
-    public List<DebtResponse> getAllDebtForUser(Integer userId) {
-        // get user from userId
-        User existsUser = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+    public List<DebtResponse> getAllDebtForUser(
+            Integer userId
+    ) {
 
-        List<Debt> listDebt = debtRepository.findByUserId(userId);
-        ArrayList<DebtResponse> responseList = new ArrayList<>();
+        getUserById(userId);
 
-        for (Debt debt : listDebt) {
-            DebtResponse response = new DebtResponse(debt.getId(), debt.getAmount(), debt.getCreditor(),
-                    debt.getCreditorName(), debt.getDebtor(), debt.getDebtorName(),
-                    debt.getDueDate(), debt.getStatus(), debt.getPriority(),
-                    debt.getRecurring(), debt.getCategory(), debt.getNote(),
-                    debt.getDay(), debt.getDate(), debt.getCreatedAt(),
-                    debt.getUpdatedAt(), debt.getUser());
-
-            responseList.add(response);
-
-        }
-        return responseList;
-
+        return debtRepository.findByUserId(userId)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
+    // GET SINGLE DEBT
     @Override
-    public DebtResponse getDebt(Integer debtId) {
+    public DebtResponse getDebt(
 
-        Debt existsDebt = debtRepository.findById(debtId)
-                .orElseThrow(() -> new DebtNotFoundException("Debt Not found with Debt Id:  " + debtId));
+            Integer userId,
 
-        return new DebtResponse(existsDebt.getId(), existsDebt.getAmount(), existsDebt.getCreditor(), existsDebt.getCreditorName(),
-                existsDebt.getDebtor(), existsDebt.getDebtorName(), existsDebt.getDueDate(), existsDebt.getStatus(),
-                existsDebt.getPriority(), existsDebt.getRecurring(), existsDebt.getCategory(), existsDebt.getNote(),
-                existsDebt.getDay(), existsDebt.getDate(), existsDebt.getCreatedAt(), existsDebt.getUpdatedAt(), existsDebt.getUser());
+            Integer debtId
+    ) {
 
+        Debt debt = getDebtByIdAndUserId(
+                debtId,
+                userId
+        );
+
+        return mapToResponse(debt);
     }
 
+    // UPDATE DEBT
     @Override
-    public List<DebtResponse> getAllDebt() {
+    public DebtResponse updateDebt(
 
-        List<Debt> allDebt = debtRepository.findAll();
-        ArrayList<DebtResponse> debtResponses = new ArrayList<>();
-        for (Debt debt : allDebt) {
-            DebtResponse debtResponse = new DebtResponse(
-                    debt.getId(), debt.getAmount(), debt.getCreditor(), debt.getCreditorName(),
-                    debt.getDebtor(), debt.getDebtorName(), debt.getDueDate(), debt.getStatus(),
-                    debt.getPriority(), debt.getRecurring(), debt.getCategory(), debt.getNote(),
-                    debt.getDay(), debt.getDate(), debt.getCreatedAt(), debt.getUpdatedAt()
-            );
-            debtResponses.add(debtResponse);
+            Integer userId,
 
-            // if we need user details also then use this one
-//            DebtResponse debtResponse = new DebtResponse(
-//                    debt.getId(), debt.getAmount(), debt.getCreditor(), debt.getCreditorName(),
-//                    debt.getDebtor(), debt.getDebtorName(), debt.getDueDate(), debt.getStatus(),
-//                    debt.getPriority(), debt.isRecurring(), debt.getCategory(), debt.getNote(),
-//                    debt.getDay(), debt.getDate(), debt.getCreatedAt(), debt.getUpdatedAt(),debt.getUser()
-//            );
-//            debtResponses.add(debtResponse);
-        }
-        return debtResponses;
+            Integer debtId,
+
+            DebtRequest debtRequest
+    ) {
+
+        Debt debt = getDebtByIdAndUserId(
+                debtId,
+                userId
+        );
+
+        debt.setAmount(debtRequest.getAmount());
+        debt.setCreditor(debtRequest.getCreditor());
+        debt.setCreditorName(debtRequest.getCreditorName());
+        debt.setDebtor(debtRequest.getDebtor());
+        debt.setDebtorName(debtRequest.getDebtorName());
+        debt.setDueDate(debtRequest.getDueDate());
+        debt.setStatus(debtRequest.getStatus());
+        debt.setPriority(debtRequest.getPriority());
+        debt.setRecurring(debtRequest.getRecurring());
+        debt.setCategory(debtRequest.getCategory());
+        debt.setNote(debtRequest.getNote());
+        debt.setDate(debtRequest.getDate());
+
+        Debt updatedDebt = debtRepository.save(debt);
+
+        return mapToResponse(updatedDebt);
     }
 
+    // DELETE DEBT
     @Override
-    public String updateDebt(Integer userId, Integer debtId, DebtRequest debtRequest) {
+    public void deleteDebt(
 
-        // get user from userId(param)
-        User existsUser = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+            Integer userId,
 
+            Integer debtId
+    ) {
 
-        //get Debt from debtId
-        Debt existsDebt = debtRepository.findById(debtId)
-                .orElseThrow(() -> new DebtNotFoundException("Debt Not found with Debt Id:  " + debtId));
+        Debt debt = getDebtByIdAndUserId(
+                debtId,
+                userId
+        );
 
-        BigDecimal oldAmount = existsDebt.getAmount();
-        BigDecimal newAmount = debtRequest.getAmount();
-
-        // If new amount is the same as old, just update the Debt all records and return
-        if (newAmount.compareTo(oldAmount) == 0) {
-            existsDebt.setAmount(debtRequest.getAmount());
-            existsDebt.setCreditor(debtRequest.getCreditor());
-            existsDebt.setCreditorName(debtRequest.getCreditorName());
-            existsDebt.setDebtor(debtRequest.getDebtor());
-            existsDebt.setDebtorName(debtRequest.getDebtorName());
-            existsDebt.setDueDate(debtRequest.getDueDate());
-            existsDebt.setStatus(debtRequest.getStatus());
-            existsDebt.setPriority(debtRequest.getPriority());
-            existsDebt.setRecurring(debtRequest.getRecurring());
-            existsDebt.setCategory(debtRequest.getCategory());
-            existsDebt.setNote(debtRequest.getNote());
-            existsDebt.setDay(existsDebt.getDay());
-            existsDebt.setDate(existsDebt.getDate());
-            existsDebt.setUpdatedAt(new Date());
-
-            debtRepository.save(existsDebt);
-            return "Debt Updated SuccessFully , Debt Id :" + debtId; //  Exit the function early (no need to update user's Debt)
-        }
-
-        // if NewAmount is greater than old Amount → Add the difference to user table
-
-        if (newAmount.compareTo(oldAmount) > 0) {
-            BigDecimal difference = newAmount.subtract(oldAmount);
-            existsUser.setDebt(existsUser.getDebt().add(difference));
-        } else {
-            // if New amount is smaller → Subtract the difference
-            BigDecimal difference = oldAmount.subtract(newAmount);
-
-            if (existsUser.getDebt().subtract(difference).compareTo(BigDecimal.ZERO) < 0) {
-                throw new DebtNotFoundException("Not enough balance to update this Debt");
-            }
-
-            existsUser.setDebt(existsUser.getDebt().subtract(difference));
-        }
-
-        // Update the Debt record
-        existsDebt.setAmount(newAmount);
-
-        existsDebt.setCreditor(debtRequest.getCreditor());
-        existsDebt.setCreditorName(debtRequest.getCreditorName());
-        existsDebt.setDebtor(debtRequest.getDebtor());
-        existsDebt.setDebtorName(debtRequest.getDebtorName());
-        existsDebt.setDueDate(debtRequest.getDueDate());
-        existsDebt.setStatus(debtRequest.getStatus());
-        existsDebt.setPriority(debtRequest.getPriority());
-        existsDebt.setRecurring(debtRequest.getRecurring());
-        existsDebt.setCategory(debtRequest.getCategory());
-        existsDebt.setNote(debtRequest.getNote());
-        existsDebt.setDay(existsDebt.getDay());
-        existsDebt.setDate(existsDebt.getDate());
-        existsDebt.setUpdatedAt(new Date());
-
-        // Save updates
-        debtRepository.save(existsDebt);
-        existsUser.setUpdatedAt(new Date());
-        userRepository.save(existsUser);
-
-        return "Debt Updated SuccessFully , Debt Id :" + debtId;
+        debtRepository.delete(debt);
     }
 
-    @Override
-    public String deleteDebt(Integer userId, Integer debtId) {
-        User existsUser = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+    // HELPER METHOD
+    private User getUserById(Integer userId) {
 
-        Debt existsDebt = debtRepository.findById(debtId)
-                .orElseThrow(() -> new DebtNotFoundException("Debt Not found with Debt Id:  " + debtId));
+        return userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new UserNotFoundException(
+                                "User not found with ID: " + userId
+                        )
+                );
+    }
 
-        BigDecimal debtAmount = existsDebt.getAmount();
+    // HELPER METHOD
+    private Debt getDebtByIdAndUserId(
 
-        try {
-            existsUser.setDebt(existsUser.getDebt().subtract(debtAmount));
+            Integer debtId,
 
-            // Remove Debt record
-            debtRepository.delete(existsDebt);
-            existsUser.setUpdatedAt(new Date());
-            userRepository.save(existsUser);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return "Deleted Debt Id : -> " + debtId;
+            Integer userId
+    ) {
+
+        return debtRepository.findByIdAndUserId(
+                        debtId,
+                        userId
+                )
+                .orElseThrow(() ->
+                        new DebtNotFoundException(
+                                "Debt not found with ID: " + debtId
+                        )
+                );
+    }
+
+    // MAPPER METHOD
+    private DebtResponse mapToResponse(Debt debt) {
+
+        DebtResponse response = new DebtResponse();
+
+        response.setId(debt.getId());
+        response.setAmount(debt.getAmount());
+        response.setCreditor(debt.getCreditor());
+        response.setCreditorName(debt.getCreditorName());
+        response.setDebtor(debt.getDebtor());
+        response.setDebtorName(debt.getDebtorName());
+        response.setDueDate(debt.getDueDate());
+        response.setStatus(debt.getStatus());
+        response.setPriority(debt.getPriority());
+        response.setRecurring(debt.getRecurring());
+        response.setCategory(debt.getCategory());
+        response.setNote(debt.getNote());
+        response.setDate(debt.getDate());
+
+        response.setUserId(
+                debt.getUser().getId()
+        );
+
+        response.setCreatedAt(
+                debt.getCreatedAt()
+        );
+
+        response.setUpdatedAt(
+                debt.getUpdatedAt()
+        );
+
+        return response;
     }
 }

@@ -4,22 +4,39 @@ import com.abdulmajid.expensetracker.enums.DefaultIncomeCategory;
 import com.abdulmajid.expensetracker.model.IncomeCategory;
 import com.abdulmajid.expensetracker.repository.IncomeCategoryRepository;
 import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
+
 public class DefaultIncomeCategoryInitializer {
 
-    @Autowired
-    private IncomeCategoryRepository incomeCategoryRepository;
+    private final IncomeCategoryRepository incomeCategoryRepository;
 
     @PostConstruct
     public void initDefaultIncomeCategories() {
-        for (DefaultIncomeCategory defaultIncomeCategory : DefaultIncomeCategory.values()) {
-            if (!incomeCategoryRepository.existsByCategoryName(defaultIncomeCategory.name())) {
-                IncomeCategory incomeCategory = new IncomeCategory();
-                incomeCategory.setCategoryName(defaultIncomeCategory.name());
+
+        for (DefaultIncomeCategory category
+                : DefaultIncomeCategory.values()) {
+
+            boolean exists =
+                    incomeCategoryRepository
+                            .existsByCategoryName(
+                                    category.name()
+                            );
+
+            if (!exists) {
+
+                IncomeCategory incomeCategory =
+                        new IncomeCategory();
+
+                incomeCategory.setCategoryName(
+                        category.name()
+                );
+
                 incomeCategory.setDefaultCategory(true);
+
                 incomeCategoryRepository.save(incomeCategory);
             }
         }

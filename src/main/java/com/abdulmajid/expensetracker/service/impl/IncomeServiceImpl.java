@@ -1,220 +1,265 @@
 package com.abdulmajid.expensetracker.service.impl;
 
-import com.abdulmajid.expensetracker.dto.IncomeCategoryResponse;
-import com.abdulmajid.expensetracker.dto.IncomeRequest;
-import com.abdulmajid.expensetracker.dto.IncomeResponse;
+import com.abdulmajid.expensetracker.dto.request.IncomeRequest;
+import com.abdulmajid.expensetracker.dto.response.IncomeResponse;
 import com.abdulmajid.expensetracker.exception.custom.CategoryNotFoundException;
 import com.abdulmajid.expensetracker.exception.custom.IncomeNotFoundException;
 import com.abdulmajid.expensetracker.exception.custom.UserNotFoundException;
 import com.abdulmajid.expensetracker.model.Income;
 import com.abdulmajid.expensetracker.model.IncomeCategory;
 import com.abdulmajid.expensetracker.model.User;
-import com.abdulmajid.expensetracker.repository.ExpenseCategoryRepository;
 import com.abdulmajid.expensetracker.repository.IncomeCategoryRepository;
 import com.abdulmajid.expensetracker.repository.IncomeRepository;
 import com.abdulmajid.expensetracker.repository.UserRepository;
 import com.abdulmajid.expensetracker.service.IncomeService;
-import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
+
 public class IncomeServiceImpl implements IncomeService {
-    @Autowired
-    private IncomeRepository incomeRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final IncomeRepository incomeRepository;
 
-    @Autowired
-    private ExpenseCategoryRepository expenseCategoryRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private IncomeCategoryRepository incomeCategoryRepository;
+    private final IncomeCategoryRepository incomeCategoryRepository;
 
+    // CREATE INCOME
     @Override
-    public IncomeResponse createIncomeForUser(@Valid Integer userId, IncomeRequest incomeRequest) {
+    public IncomeResponse createIncomeForUser(
 
-        // get user from userId(param)
-        User existsUser = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+            Integer userId,
 
+            IncomeRequest incomeRequest
+    ) {
 
-        //get category from id
-        IncomeCategory dbIncomeCategory = incomeCategoryRepository.findById(incomeRequest.getCategoryId())
-                .orElseThrow(() -> new CategoryNotFoundException("Income Category not found "));
+        User user = getUserById(userId);
 
+        IncomeCategory incomeCategory =
+                getIncomeCategoryById(
+                        incomeRequest.getCategoryId()
+                );
 
-        Income income = new Income(incomeRequest.getAmount(), incomeRequest.getReceiveMode(),
-                incomeRequest.getNote(), incomeRequest.getDay(),
-                incomeRequest.getDate(), dbIncomeCategory, existsUser);
+        Income income = new Income(
+                incomeRequest.getAmount(),
+                incomeRequest.getReceiveMode(),
+                incomeRequest.getNote(),
+                incomeRequest.getDate(),
+                incomeCategory,
+                user
+        );
 
-        Income saveIncome = incomeRepository.save(income);
+        Income savedIncome =
+                incomeRepository.save(income);
 
-        //get Total income from user table
-        BigDecimal oldTotalIncome = existsUser.getIncome();
-        BigDecimal newTotalIncome = oldTotalIncome.add(incomeRequest.getAmount());
-
-        //add newTotalIncome in user table
-
-        existsUser.setIncome(newTotalIncome);
-        existsUser.setUpdatedAt(new Date());
-
-        userRepository.save(existsUser);
-        IncomeCategoryResponse incomeCategoryResponse = new IncomeCategoryResponse(dbIncomeCategory.getId(),
-                dbIncomeCategory.getCategoryName(), dbIncomeCategory.isDefaultCategory());
-
-        return new IncomeResponse(saveIncome.getId(), saveIncome.getAmount(),
-                saveIncome.getReceiveMode(), saveIncome.getNote(),
-                saveIncome.getDay(), saveIncome.getDate(), saveIncome.getCreatedAt(),
-                saveIncome.getUpdatedAt(), incomeCategoryResponse, saveIncome.getUser());
-
+        return mapToResponse(savedIncome);
     }
 
+    // GET ALL USER INCOMES
     @Override
-    public List<IncomeResponse> getAllIncomeForUser(Integer userId) {
+    public List<IncomeResponse> getAllIncomeForUser(
+            Integer userId
+    ) {
 
-        // get user from userId(param)
-        User existsUser = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+        getUserById(userId);
 
-        List<Income> userIncomeList = incomeRepository.findByUserId(userId);
-
-        ArrayList<IncomeResponse> incomeResponses = new ArrayList<>();
-        for (Income income : userIncomeList) {
-            IncomeResponse incomeResponse = new IncomeResponse(income.getId(), income.getAmount(),
-                    income.getReceiveMode(), income.getNote(), income.getDay(), income.getDate(),
-                    income.getCreatedAt(), income.getUpdatedAt(),
-                    new IncomeCategoryResponse(income.getIncomeCategory().getId(),
-                            income.getIncomeCategory().getCategoryName(),
-                            income.getIncomeCategory().isDefaultCategory()));
-            incomeResponses.add(incomeResponse);
-        }
-        return incomeResponses;
+        return incomeRepository.findByUserId(userId)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
+    // GET SINGLE INCOME
     @Override
-    public IncomeResponse getIncome(Integer incomeId) {
-        Income existsIncome = incomeRepository.findById(incomeId)
-                .orElseThrow(() -> new IncomeNotFoundException("Income Not found with Income Id:  " + incomeId));
+    public IncomeResponse getIncome(
 
-        //get category from existsIncome
-        IncomeCategory dbIncomeCategory = incomeCategoryRepository.findById(existsIncome.getIncomeCategory().getId())
-                .orElseThrow(() -> new CategoryNotFoundException("Income Category not found "));
+            Integer userId,
 
-        IncomeCategoryResponse incomeCategoryResponse = new IncomeCategoryResponse(dbIncomeCategory.getId(),
-                dbIncomeCategory.getCategoryName(), dbIncomeCategory.isDefaultCategory());
+            Integer incomeId
+    ) {
 
-        return new IncomeResponse(existsIncome.getId(), existsIncome.getAmount(),
-                existsIncome.getReceiveMode(), existsIncome.getNote(),
-                existsIncome.getDay(), existsIncome.getDate(), existsIncome.getCreatedAt(),
-                existsIncome.getUpdatedAt(), incomeCategoryResponse, existsIncome.getUser());
+        Income income = getIncomeByIdAndUserId(
+                incomeId,
+                userId
+        );
 
+        return mapToResponse(income);
     }
 
+    // GET ALL INCOMES
     @Override
     public List<IncomeResponse> getAllIncome() {
-        List<Income> allIncome = incomeRepository.findAll();
-        ArrayList<IncomeResponse> incomeResponses = new ArrayList<>();
-        for (Income income : allIncome) {
-            IncomeResponse incomeResponse = new IncomeResponse(income.getId(), income.getAmount(),
-                    income.getReceiveMode(), income.getNote(), income.getDay(), income.getDate(),
-                    income.getCreatedAt(), income.getUpdatedAt(),
-                    new IncomeCategoryResponse(income.getIncomeCategory().getId(),
-                            income.getIncomeCategory().getCategoryName(),
-                            income.getIncomeCategory().isDefaultCategory()));
-            incomeResponses.add(incomeResponse);
-        }
-        return incomeResponses;
+
+        return incomeRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
-
+    // UPDATE INCOME
     @Override
-    public String updateIncome(Integer userId, Integer incomeId, IncomeRequest incomeRequest) {
+    public IncomeResponse updateIncome(
 
-        // get user from userId(param)
-        User existsUser = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+            Integer userId,
 
+            Integer incomeId,
 
-        //get income from incomeId
-        Income existsIncome = incomeRepository.findById(incomeId)
-                .orElseThrow(() -> new IncomeNotFoundException("Income Not found with Income Id:  " + incomeId));
+            IncomeRequest incomeRequest
+    ) {
 
-        BigDecimal oldAmount = existsIncome.getAmount();
-        BigDecimal newAmount = incomeRequest.getAmount();
+        Income income = getIncomeByIdAndUserId(
+                incomeId,
+                userId
+        );
 
-        IncomeCategory dbIncomeCategory = incomeCategoryRepository.findById(existsIncome.getIncomeCategory().getId())
-                .orElseThrow(() -> new CategoryNotFoundException("Income Category not found "));
+        IncomeCategory incomeCategory =
+                getIncomeCategoryById(
+                        incomeRequest.getCategoryId()
+                );
 
+        income.setAmount(
+                incomeRequest.getAmount()
+        );
 
-        // If new amount is the same as old, just update the income all records and return
-        if (newAmount.compareTo(oldAmount) == 0) {
-            existsIncome.setIncomeCategory(dbIncomeCategory);
-            existsIncome.setNote(incomeRequest.getNote());
-            existsIncome.setUpdatedAt(new Date());
+        income.setReceiveMode(
+                incomeRequest.getReceiveMode()
+        );
 
-            incomeRepository.save(existsIncome);
-            return "Income Updated SuccessFully , Income Id :" + incomeId; //  Exit the function early (no need to update user's income)
-        }
+        income.setNote(
+                incomeRequest.getNote()
+        );
 
-        // if NewAmount is greater than old Amount → Add the difference to user table
+        income.setDate(
+                incomeRequest.getDate()
+        );
 
-        if (newAmount.compareTo(oldAmount) > 0) {
-            BigDecimal difference = newAmount.subtract(oldAmount);
-            existsUser.setIncome(existsUser.getIncome().add(difference));
-        } else {
-            // if New amount is smaller → Subtract the difference
-            BigDecimal difference = oldAmount.subtract(newAmount);
+        income.setIncomeCategory(
+                incomeCategory
+        );
 
-            if (existsUser.getIncome().subtract(difference).compareTo(BigDecimal.ZERO) < 0) {
-                throw new IncomeNotFoundException("Not enough balance to update this income");
-            }
+        Income updatedIncome =
+                incomeRepository.save(income);
 
-            existsUser.setIncome(existsUser.getIncome().subtract(difference));
-        }
-
-        // Update the income record
-        existsIncome.setAmount(newAmount);
-        existsIncome.setIncomeCategory(dbIncomeCategory);
-        existsIncome.setNote(incomeRequest.getNote());
-        existsIncome.setUpdatedAt(new Date());
-
-        // Save updates
-        incomeRepository.save(existsIncome);
-        existsUser.setUpdatedAt(new Date());
-        userRepository.save(existsUser);
-
-        return "Income Updated SuccessFully , Income Id :" + incomeId;
+        return mapToResponse(updatedIncome);
     }
 
+    // DELETE INCOME
     @Override
-    public String deleteIncome(Integer userId, Integer incomeId) {
+    public void deleteIncome(
 
-        User existsUser = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+            Integer userId,
 
-        Income existsIncome = incomeRepository.findById(incomeId)
-                .orElseThrow(() -> new IncomeNotFoundException("Income Not found with Income Id:  " + incomeId));
+            Integer incomeId
+    ) {
 
-        BigDecimal incomeAmount = existsIncome.getAmount();
+        Income income = getIncomeByIdAndUserId(
+                incomeId,
+                userId
+        );
 
-        try {
-            existsUser.setIncome(existsUser.getIncome().subtract(incomeAmount));
+        incomeRepository.delete(income);
+    }
 
-            // Remove income record
-            incomeRepository.delete(existsIncome);
-            userRepository.save(existsUser);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return "Deleted Income Id : -> " + incomeId;
+    // HELPER METHOD
+    private User getUserById(
+            Integer userId
+    ) {
+
+        return userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new UserNotFoundException(
+                                "User not found with ID: " + userId
+                        )
+                );
+    }
+
+    // HELPER METHOD
+    private IncomeCategory getIncomeCategoryById(
+            Integer categoryId
+    ) {
+
+        return incomeCategoryRepository.findById(categoryId)
+                .orElseThrow(() ->
+                        new CategoryNotFoundException(
+                                "Income category not found with ID: "
+                                        + categoryId
+                        )
+                );
+    }
+
+    // HELPER METHOD
+    private Income getIncomeByIdAndUserId(
+
+            Integer incomeId,
+
+            Integer userId
+    ) {
+
+        return incomeRepository.findByIdAndUserId(
+                        incomeId,
+                        userId
+                )
+                .orElseThrow(() ->
+                        new IncomeNotFoundException(
+                                "Income not found with ID: "
+                                        + incomeId
+                        )
+                );
     }
 
 
+    // MAPPER METHOD
+    private IncomeResponse mapToResponse(
+            Income income
+    ) {
+
+        IncomeResponse response =
+                new IncomeResponse();
+
+        response.setId(
+                income.getId()
+        );
+
+        response.setAmount(
+                income.getAmount()
+        );
+
+        response.setReceiveMode(
+                income.getReceiveMode()
+        );
+
+        response.setNote(
+                income.getNote()
+        );
+
+        response.setDate(
+                income.getDate()
+        );
+
+        response.setCategoryId(
+                income.getIncomeCategory().getId()
+        );
+
+        response.setCategoryName(
+                income.getIncomeCategory().getCategoryName()
+        );
+
+        response.setUserId(
+                income.getUser().getId()
+        );
+
+        response.setCreatedAt(
+                income.getCreatedAt()
+        );
+
+        response.setUpdatedAt(
+                income.getUpdatedAt()
+        );
+
+        return response;
+    }
 }

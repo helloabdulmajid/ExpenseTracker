@@ -1,39 +1,72 @@
 package com.abdulmajid.expensetracker.controller;
 
-import com.abdulmajid.expensetracker.dto.IncomeCategoryRequest;
-import com.abdulmajid.expensetracker.dto.IncomeCategoryResponse;
-import com.abdulmajid.expensetracker.model.IncomeCategory;
+import com.abdulmajid.expensetracker.dto.request.IncomeCategoryRequest;
+import com.abdulmajid.expensetracker.dto.response.IncomeCategoryResponse;
 import com.abdulmajid.expensetracker.service.IncomeCategoryService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("income")
+@RequestMapping("income-categories")
+
+@RequiredArgsConstructor
+
 public class IncomeCategoryController {
 
-    @Autowired
-    private IncomeCategoryService incomeCategoryService;
+    private final IncomeCategoryService incomeCategoryService;
 
-    @PostMapping("/category/create/{userId}")
-    public ResponseEntity<String> createCategoryForUser(@PathVariable Integer userId,
-                                                        @RequestBody IncomeCategoryRequest incomeCategoryRequest) {
-        incomeCategoryService.createIncomeCategoryForUser(userId, incomeCategoryRequest);
-        return ResponseEntity.ok("Income Category added successfully!");
+    // CREATE CATEGORY
+    @PostMapping("/users/{userId}")
+    public ResponseEntity<IncomeCategoryResponse> createCategoryForUser(
+
+            @PathVariable Integer userId,
+
+            @Valid @RequestBody
+            IncomeCategoryRequest incomeCategoryRequest
+    ) {
+
+        IncomeCategoryResponse response =
+                incomeCategoryService.createIncomeCategoryForUser(
+                        userId,
+                        incomeCategoryRequest
+                );
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
     }
 
-    //fix this only cateroy return not user
-    @GetMapping("/categories/{userId}")
-    public List<IncomeCategory> getCategoriesForUser(@PathVariable Integer userId) {
-        return incomeCategoryService.getIncomeCategoriesForUser(userId);
+    // GET USER CATEGORIES
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<List<IncomeCategoryResponse>> getCategoriesForUser(
+
+            @PathVariable Integer userId
+    ) {
+
+        return ResponseEntity.ok(
+                incomeCategoryService.getIncomeCategoriesForUser(userId)
+        );
     }
 
-    @GetMapping("/categories")
-    public List<IncomeCategoryResponse> getAllCategories() {
-        return incomeCategoryService.getAllCategories();
+    // GET ALL CATEGORIES
+    @GetMapping("/users/{userId}/all")
+    public ResponseEntity<List<IncomeCategoryResponse>> getAllCategories() {
+
+        return ResponseEntity.ok(
+                incomeCategoryService.getAllCategories()
+        );
     }
 
-    //add another one here  getAllIncomeCategoryWithAllUser
+    @GetMapping("/default")
+    public ResponseEntity<List<IncomeCategoryResponse>> getDefaultCategories() {
+
+        return ResponseEntity.ok(
+                incomeCategoryService.getDefaultCategories()
+        );
+    }
 }

@@ -1,81 +1,150 @@
 package com.abdulmajid.expensetracker.controller;
 
-import com.abdulmajid.expensetracker.dto.ExpenseRequest;
-import com.abdulmajid.expensetracker.dto.ExpenseResponse;
+import com.abdulmajid.expensetracker.dto.request.ExpenseRequest;
+import com.abdulmajid.expensetracker.dto.response.ExpenseResponse;
 import com.abdulmajid.expensetracker.service.ExpenseService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("expense")
+@RequestMapping("/users/{userId}/expenses")
+@RequiredArgsConstructor
+
 public class ExpenseController {
-    @Autowired
-    private ExpenseService expenseService;
 
-    @PostMapping("/create/{userId}")
-    public ExpenseResponse createExpense(@PathVariable Integer userId,
-                                         @RequestBody @Valid ExpenseRequest expenseRequest) {
+    private final ExpenseService expenseService;
 
+    // CREATE EXPENSE
+    @PostMapping
+    public ResponseEntity<ExpenseResponse> createExpense(
 
-        return expenseService.createExpense(userId, expenseRequest);
-    }
-
-    @GetMapping("/user/{userId}")
-    public List<ExpenseResponse> getExpenseForUser(@PathVariable Integer userId) {
-        return expenseService.getExpenseForUser(userId);
-    }
-
-    @GetMapping("/{expenseId}")
-    public ExpenseResponse getExpense(@PathVariable Integer expenseId) {
-        return expenseService.getExpense(expenseId);
-    }
-
-    @GetMapping("/all")
-    public List<ExpenseResponse> getAllExpense() {
-        return expenseService.getAllExpense();
-    }
-
-    @PutMapping("/update/user/{userId}/expense/{expenseId}")
-    public String updateExpense(
             @PathVariable Integer userId,
+
+            @Valid @RequestBody ExpenseRequest expenseRequest
+    ) {
+
+        ExpenseResponse response =
+                expenseService.createExpense(userId, expenseRequest);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
+    }
+
+    // GET ALL EXPENSES FOR A USER
+    @GetMapping
+    public ResponseEntity<List<ExpenseResponse>> getUserExpenses(
+
+            @PathVariable Integer userId
+    ) {
+
+        List<ExpenseResponse> response =
+                expenseService.getExpenseForUser(userId);
+
+        return ResponseEntity.ok(response);
+    }
+
+    // GET SINGLE EXPENSE
+    @GetMapping("/{expenseId}")
+    public ResponseEntity<ExpenseResponse> getExpense(
+
+            @PathVariable Integer userId,
+
+            @PathVariable Integer expenseId
+    ) {
+
+        ExpenseResponse response =
+                expenseService.getExpense(userId, expenseId);
+
+        return ResponseEntity.ok(response);
+    }
+
+    // UPDATE EXPENSE
+    @PutMapping("/{expenseId}")
+    public ResponseEntity<ExpenseResponse> updateExpense(
+
+            @PathVariable Integer userId,
+
             @PathVariable Integer expenseId,
-            @RequestBody ExpenseRequest expenseRequest) {
 
-        return expenseService.updateExpense(userId, expenseId, expenseRequest);
+            @Valid @RequestBody ExpenseRequest expenseRequest
+    ) {
 
+        ExpenseResponse response =
+                expenseService.updateExpense(
+                        userId,
+                        expenseId,
+                        expenseRequest
+                );
+
+        return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/delete/user/{userId}/expense/{expenseId}")
-    public String deleteExpense(@PathVariable Integer userId,
-                                @PathVariable Integer expenseId) {
-        return expenseService.deleteExpense(userId, expenseId);
+    // DELETE EXPENSE
+    @DeleteMapping("/{expenseId}")
+    public ResponseEntity<Void> deleteExpense(
+
+            @PathVariable Integer userId,
+
+            @PathVariable Integer expenseId
+    ) {
+
+        expenseService.deleteExpense(userId, expenseId);
+
+        return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/monthly/{userId}/{month}")
-    public List<ExpenseResponse> getMonthlyExpenses(@PathVariable Integer userId, @PathVariable Integer month) {
-        return expenseService.getMonthlyExpenses(userId, month);
+    // GET MONTHLY EXPENSES
+    @GetMapping("/monthly/{month}")
+    public ResponseEntity<List<ExpenseResponse>> getMonthlyExpenses(
+
+            @PathVariable Integer userId,
+
+            @PathVariable Integer month
+    ) {
+
+        List<ExpenseResponse> response =
+                expenseService.getMonthlyExpenses(userId, month);
+
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/weekly/{userId}/{week}")
-    public List<ExpenseResponse> getWeeklyExpenses(@PathVariable Integer userId, @PathVariable Integer week) {
-        return expenseService.getWeeklyExpenses(userId, week);
+    // GET WEEKLY EXPENSES
+    @GetMapping("/weekly/{week}")
+    public ResponseEntity<List<ExpenseResponse>> getWeeklyExpenses(
+
+            @PathVariable Integer userId,
+
+            @PathVariable Integer week
+    ) {
+
+        List<ExpenseResponse> response =
+                expenseService.getWeeklyExpenses(userId, week);
+
+        return ResponseEntity.ok(response);
     }
 
-//    @GetMapping("/daily/{userId}/{day}")
-//    public List<ExpenseResponse> getDailyExpenses(@PathVariable Integer userId, @PathVariable Integer day) {
-//        return expenseService.getDailyExpenses(userId, day);
-//    }
-
+    // GET DAILY EXPENSES
     @GetMapping("/daily")
-    public List<ExpenseResponse> getDailyExpenses(
-            @RequestParam Integer userId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate day) {
-        return expenseService.getDailyExpenses(userId, day);
-    }
+    public ResponseEntity<List<ExpenseResponse>> getDailyExpenses(
 
+            @PathVariable Integer userId,
+
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate date
+    ) {
+
+        List<ExpenseResponse> response =
+                expenseService.getDailyExpenses(userId, date);
+
+        return ResponseEntity.ok(response);
+    }
 }

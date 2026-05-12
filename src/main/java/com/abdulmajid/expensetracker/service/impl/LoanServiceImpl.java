@@ -1,7 +1,7 @@
 package com.abdulmajid.expensetracker.service.impl;
 
-import com.abdulmajid.expensetracker.dto.LoanRequest;
-import com.abdulmajid.expensetracker.dto.LoanResponse;
+import com.abdulmajid.expensetracker.dto.request.LoanRequest;
+import com.abdulmajid.expensetracker.dto.response.LoanResponse;
 import com.abdulmajid.expensetracker.exception.custom.LoanNotFoundException;
 import com.abdulmajid.expensetracker.exception.custom.UserNotFoundException;
 import com.abdulmajid.expensetracker.model.Loan;
@@ -9,220 +9,294 @@ import com.abdulmajid.expensetracker.model.User;
 import com.abdulmajid.expensetracker.repository.LoanRepository;
 import com.abdulmajid.expensetracker.repository.UserRepository;
 import com.abdulmajid.expensetracker.service.LoanService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
-public class LoanServiceImpl implements LoanService {
+@RequiredArgsConstructor
 
-    @Autowired
-    private LoanRepository loanRepository;
+public class LoanServiceImpl
+        implements LoanService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final LoanRepository loanRepository;
 
+    private final UserRepository userRepository;
+
+    // CREATE LOAN
     @Override
-    public LoanResponse createLoanForUser(Integer userId, LoanRequest loanRequest) {
-        // get user from userId(param)
-        User existsUser = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+    public LoanResponse createLoanForUser(
 
-        Loan loan = new Loan(loanRequest.getAmount(), loanRequest.getLender(), loanRequest.getBorrower(),
-                loanRequest.getInterestRate(), loanRequest.getLoanType(), loanRequest.getTenureMonths(),
-                loanRequest.getStartDate(), loanRequest.getDueDate(), loanRequest.getPaymentMode(),
-                loanRequest.getIsPaid(), loanRequest.getRemainingBalance(), loanRequest.getStatus(),
-                loanRequest.getNote(), loanRequest.getDay(), loanRequest.getDate(), existsUser);
-        Loan saveLoan = loanRepository.save(loan);
+            Integer userId,
 
-        //get Total income from user table
-        BigDecimal oldTotalLoan = existsUser.getLoan();
-        BigDecimal newTotalLoan = oldTotalLoan.add(loanRequest.getAmount());
+            LoanRequest loanRequest
+    ) {
 
-        existsUser.setLoan(newTotalLoan);
-        existsUser.setUpdatedAt(new Date());
-        userRepository.save(existsUser);
+        User user = getUserById(userId);
 
-        return new LoanResponse(saveLoan.getId(), saveLoan.getAmount(), saveLoan.getLender(),
-                saveLoan.getBorrower(), saveLoan.getInterestRate(), saveLoan.getLoanType(),
-                saveLoan.getTenureMonths(), saveLoan.getStartDate(), saveLoan.getDueDate(),
-                saveLoan.getPaymentMode(), saveLoan.getIsPaid(), saveLoan.getRemainingBalance(),
-                saveLoan.getStatus(), saveLoan.getNote(), saveLoan.getDay(), saveLoan.getDate(),
-                saveLoan.getCreatedAt(), saveLoan.getUpdatedAt(), saveLoan.getUser());
+        Loan loan = new Loan(
+
+                loanRequest.getAmount(),
+
+                loanRequest.getLender(),
+
+                loanRequest.getLenderName(),
+
+                loanRequest.getBorrower(),
+
+                loanRequest.getBorrowerName(),
+
+                loanRequest.getDueDate(),
+
+                loanRequest.getStatus(),
+
+                loanRequest.getLoanType(),
+
+                loanRequest.getRecurring(),
+
+                loanRequest.getNote(),
+
+                loanRequest.getDate(),
+
+                user
+        );
+
+        Loan savedLoan =
+                loanRepository.save(loan);
+
+        return mapToResponse(savedLoan);
     }
 
+    // GET ALL USER LOANS
     @Override
-    public List<LoanResponse> getAllLoanForUser(Integer userId) {
-        // get user from userId
-        User existsUser = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+    public List<LoanResponse> getAllLoanForUser(
+            Integer userId
+    ) {
 
-        List<Loan> listLoan = loanRepository.findByUserId(userId);
-        ArrayList<LoanResponse> responseList = new ArrayList<>();
+        getUserById(userId);
 
-        for (Loan loan : listLoan) {
-            LoanResponse response = new LoanResponse(loan.getId(), loan.getAmount(), loan.getLender(),
-                    loan.getBorrower(), loan.getInterestRate(), loan.getLoanType(),
-                    loan.getTenureMonths(), loan.getStartDate(), loan.getDueDate(),
-                    loan.getPaymentMode(), loan.getIsPaid(), loan.getRemainingBalance(),
-                    loan.getStatus(), loan.getNote(), loan.getDay(), loan.getDate(),
-                    loan.getCreatedAt(), loan.getUpdatedAt());
-
-            responseList.add(response);
-
-        }
-        return responseList;
-
+        return loanRepository.findByUserId(userId)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
+    // GET SINGLE LOAN
     @Override
-    public LoanResponse getOneLoan(Integer loanId) {
+    public LoanResponse getOneLoan(
 
-        Loan loan = loanRepository.findById(loanId)
-                .orElseThrow(() -> new UserNotFoundException("Loan not found with ID: " + loanId));
+            Integer userId,
 
-        return new LoanResponse(loan.getId(), loan.getAmount(), loan.getLender(),
-                loan.getBorrower(), loan.getInterestRate(), loan.getLoanType(),
-                loan.getTenureMonths(), loan.getStartDate(), loan.getDueDate(),
-                loan.getPaymentMode(), loan.getIsPaid(), loan.getRemainingBalance(),
-                loan.getStatus(), loan.getNote(), loan.getDay(), loan.getDate(),
-                loan.getCreatedAt(), loan.getUpdatedAt(), loan.getUser());
+            Integer loanId
+    ) {
+
+        Loan loan =
+                getLoanByIdAndUserId(
+                        loanId,
+                        userId
+                );
+
+        return mapToResponse(loan);
     }
 
+    // GET ALL LOANS
     @Override
     public List<LoanResponse> getAllLoans() {
-        List<Loan> allLoans = loanRepository.findAll();
-        ArrayList<LoanResponse> loanResponses = new ArrayList<>();
-        for (Loan loan : allLoans) {
-            LoanResponse loanResponse = new LoanResponse(
-                    loan.getId(), loan.getAmount(), loan.getLender(),
-                    loan.getBorrower(), loan.getInterestRate(), loan.getLoanType(),
-                    loan.getTenureMonths(), loan.getStartDate(), loan.getDueDate(),
-                    loan.getPaymentMode(), loan.getIsPaid(), loan.getRemainingBalance(),
-                    loan.getStatus(), loan.getNote(), loan.getDay(), loan.getDate(),
-                    loan.getCreatedAt(), loan.getUpdatedAt()
-            );
-            loanResponses.add(loanResponse);
 
-            // if we need user details also then use this one
-//            LoanResponse loanResponse = new LoanResponse(
-//                    loan.getId(), loan.getAmount(), loan.getLender(),
-//                    loan.getBorrower(), loan.getInterestRate(), loan.getLoanType(),
-//                    loan.getTenureMonths(), loan.getStartDate(), loan.getDueDate(),
-//                    loan.getPaymentMode(), loan.getIsPaid(), loan.getRemainingBalance(),
-//                    loan.getStatus(), loan.getNote(), loan.getDay(), loan.getDate(),
-//                    loan.getCreatedAt(), loan.getUpdatedAt(),loan.getUser()
-//            );
-//            loanResponses.add(loanResponse);
-
-
-        }
-        return loanResponses;
+        return loanRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
+    // UPDATE LOAN
     @Override
-    public String updateLoan(Integer userId, Integer loanId, LoanRequest loanRequest) {
-        // get user from userId(param)
-        User existsUser = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+    public LoanResponse updateLoan(
 
-        //get Loan from LoanId
-        Loan existsLoan = loanRepository.findById(loanId)
-                .orElseThrow(() -> new LoanNotFoundException("Loan Not found with Loan Id:  " + loanId));
+            Integer userId,
 
-        BigDecimal oldAmount = existsLoan.getAmount();
-        BigDecimal newAmount = loanRequest.getAmount();
+            Integer loanId,
 
-        // If new amount is the same as old, just update the Loan all records and return
-        if (newAmount.compareTo(oldAmount) == 0) {
-            existsLoan.setAmount(loanRequest.getAmount());
-            existsLoan.setLender(loanRequest.getLender());
-            existsLoan.setBorrower(loanRequest.getBorrower());
-            existsLoan.setInterestRate(loanRequest.getInterestRate());
-            existsLoan.setLoanType(loanRequest.getLoanType());
-            existsLoan.setTenureMonths(loanRequest.getTenureMonths());
-            existsLoan.setStartDate(loanRequest.getStartDate());
-            existsLoan.setStartDate(loanRequest.getStartDate());
-            existsLoan.setDueDate(loanRequest.getDueDate());
-            existsLoan.setPaymentMode(loanRequest.getPaymentMode());
-            existsLoan.setIsPaid(loanRequest.getIsPaid());
-            existsLoan.setRemainingBalance(loanRequest.getRemainingBalance());
-            existsLoan.setStatus(loanRequest.getStatus());
-            existsLoan.setNote(loanRequest.getNote());
-            existsLoan.setDay(existsLoan.getDay());
-            existsLoan.setDate(existsLoan.getDate());
-            existsLoan.setUpdatedAt(new Date());
-            loanRepository.save(existsLoan);
-            return "Loan Updated SuccessFully , Loan Id :" + loanId; //  Exit the function early (no need to update user's Loan)
-        }
+            LoanRequest loanRequest
+    ) {
 
-        // if NewAmount is greater than old Amount → Add the difference to user table
+        Loan loan =
+                getLoanByIdAndUserId(
+                        loanId,
+                        userId
+                );
 
-        if (newAmount.compareTo(oldAmount) > 0) {
-            BigDecimal difference = newAmount.subtract(oldAmount);
-            existsUser.setLoan(existsUser.getLoan().add(difference));
-        } else {
-            // if New amount is smaller → Subtract the difference
-            BigDecimal difference = oldAmount.subtract(newAmount);
+        loan.setAmount(
+                loanRequest.getAmount()
+        );
 
-            if (existsUser.getLoan().subtract(difference).compareTo(BigDecimal.ZERO) < 0) {
-                throw new LoanNotFoundException("Not enough balance to update this Loan");
-            }
+        loan.setLender(
+                loanRequest.getLender()
+        );
 
-            existsUser.setLoan(existsUser.getLoan().subtract(difference));
-        }
+        loan.setLenderName(
+                loanRequest.getLenderName()
+        );
 
-        // Update the Loan record
-        existsLoan.setAmount(newAmount);
-        existsLoan.setLender(loanRequest.getLender());
-        existsLoan.setBorrower(loanRequest.getBorrower());
-        existsLoan.setInterestRate(loanRequest.getInterestRate());
-        existsLoan.setLoanType(loanRequest.getLoanType());
-        existsLoan.setTenureMonths(loanRequest.getTenureMonths());
-        existsLoan.setStartDate(loanRequest.getStartDate());
-        existsLoan.setStartDate(loanRequest.getStartDate());
-        existsLoan.setDueDate(loanRequest.getDueDate());
-        existsLoan.setPaymentMode(loanRequest.getPaymentMode());
-        existsLoan.setIsPaid(loanRequest.getIsPaid());
-        existsLoan.setRemainingBalance(loanRequest.getRemainingBalance());
-        existsLoan.setStatus(loanRequest.getStatus());
-        existsLoan.setNote(loanRequest.getNote());
-        existsLoan.setDay(existsLoan.getDay());
-        existsLoan.setDate(existsLoan.getDate());
-        existsLoan.setUpdatedAt(new Date());
+        loan.setBorrower(
+                loanRequest.getBorrower()
+        );
 
-        // Save updates
-        loanRepository.save(existsLoan);
-        existsUser.setUpdatedAt(new Date());
-        userRepository.save(existsUser);
+        loan.setBorrowerName(
+                loanRequest.getBorrowerName()
+        );
 
-        return "Loan Updated SuccessFully , Loan Id :" + loanId;
+        loan.setDueDate(
+                loanRequest.getDueDate()
+        );
+
+        loan.setStatus(
+                loanRequest.getStatus()
+        );
+
+        loan.setLoanType(
+                loanRequest.getLoanType()
+        );
+
+        loan.setRecurring(
+                loanRequest.getRecurring()
+        );
+
+        loan.setNote(
+                loanRequest.getNote()
+        );
+
+        loan.setDate(
+                loanRequest.getDate()
+        );
+
+        Loan updatedLoan =
+                loanRepository.save(loan);
+
+        return mapToResponse(updatedLoan);
     }
 
+    // DELETE LOAN
     @Override
-    public String deleteLoan(Integer userId, Integer loanId) {
-        User existsUser = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+    public void deleteLoan(
 
-        Loan existsLoan = loanRepository.findById(loanId)
-                .orElseThrow(() -> new LoanNotFoundException("Loan Not found with Loan Id:  " + loanId));
+            Integer userId,
 
-        BigDecimal LoanAmount = existsLoan.getAmount();
+            Integer loanId
+    ) {
 
-        try {
-            existsUser.setLoan(existsUser.getLoan().subtract(LoanAmount));
+        Loan loan =
+                getLoanByIdAndUserId(
+                        loanId,
+                        userId
+                );
 
-            // Remove Loan record
-            loanRepository.delete(existsLoan);
-            existsUser.setUpdatedAt(new Date());
-            userRepository.save(existsUser);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return "Deleted Loan Id : -> " + loanId;
+        loanRepository.delete(loan);
+    }
+
+    // HELPER METHOD
+    private User getUserById(
+            Integer userId
+    ) {
+
+        return userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new UserNotFoundException(
+                                "User not found with ID: "
+                                        + userId
+                        )
+                );
+    }
+
+    // HELPER METHOD
+    private Loan getLoanByIdAndUserId(
+
+            Integer loanId,
+
+            Integer userId
+    ) {
+
+        return loanRepository.findByIdAndUserId(
+                        loanId,
+                        userId
+                )
+                .orElseThrow(() ->
+                        new LoanNotFoundException(
+                                "Loan not found with ID: "
+                                        + loanId
+                        )
+                );
+    }
+
+    // MAPPER METHOD
+    private LoanResponse mapToResponse(
+            Loan loan
+    ) {
+
+        LoanResponse response =
+                new LoanResponse();
+
+        response.setId(
+                loan.getId()
+        );
+
+        response.setAmount(
+                loan.getAmount()
+        );
+
+        response.setLender(
+                loan.getLender()
+        );
+
+        response.setLenderName(
+                loan.getLenderName()
+        );
+
+        response.setBorrower(
+                loan.getBorrower()
+        );
+
+        response.setBorrowerName(
+                loan.getBorrowerName()
+        );
+
+        response.setDueDate(
+                loan.getDueDate()
+        );
+
+        response.setStatus(
+                loan.getStatus()
+        );
+
+        response.setLoanType(
+                loan.getLoanType()
+        );
+
+        response.setRecurring(
+                loan.getRecurring()
+        );
+
+        response.setNote(
+                loan.getNote()
+        );
+
+        response.setDate(
+                loan.getDate()
+        );
+
+        response.setUserId(
+                loan.getUser().getId()
+        );
+
+        response.setCreatedAt(
+                loan.getCreatedAt()
+        );
+
+        response.setUpdatedAt(
+                loan.getUpdatedAt()
+        );
+
+        return response;
     }
 }

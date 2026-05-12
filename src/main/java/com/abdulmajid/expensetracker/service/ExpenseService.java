@@ -1,27 +1,65 @@
 package com.abdulmajid.expensetracker.service;
 
-import com.abdulmajid.expensetracker.dto.ExpenseRequest;
-import com.abdulmajid.expensetracker.dto.ExpenseResponse;
+import com.abdulmajid.expensetracker.dto.request.ExpenseRequest;
+import com.abdulmajid.expensetracker.dto.response.ExpenseResponse;
 
 import java.time.LocalDate;
 import java.util.List;
 
 public interface ExpenseService {
-    public ExpenseResponse createExpense(Integer userId, ExpenseRequest expenseRequest);
 
-    List<ExpenseResponse> getExpenseForUser(Integer userId);
+    ExpenseResponse createExpense(
+            Integer userId,
+            ExpenseRequest expenseRequest
+    );
 
-    ExpenseResponse getExpense(Integer expenseId);
+    List<ExpenseResponse> getExpenseForUser(
+            Integer userId
+    );
+
+    ExpenseResponse getExpense(
+
+            Integer userId,
+
+            Integer expenseId
+    );
 
     List<ExpenseResponse> getAllExpense();
 
-    String updateExpense(Integer userId, Integer expenseId, ExpenseRequest expenseRequest);
+    ExpenseResponse updateExpense(
 
-    String deleteExpense(Integer userId, Integer expenseId);
+            Integer userId,
 
-    List<ExpenseResponse> getMonthlyExpenses(Integer userId, Integer month);
+            Integer expenseId,
 
-    List<ExpenseResponse> getWeeklyExpenses(Integer userId, Integer week);
+            ExpenseRequest expenseRequest
+    );
 
-    List<ExpenseResponse> getDailyExpenses(Integer userId, LocalDate day);
+    void deleteExpense(
+
+            Integer userId,
+
+            Integer expenseId
+    );
+
+    List<ExpenseResponse> getMonthlyExpenses(
+
+            Integer userId,
+
+            Integer month
+    );
+
+    List<ExpenseResponse> getWeeklyExpenses(
+
+            Integer userId,
+
+            Integer week
+    );
+
+    List<ExpenseResponse> getDailyExpenses(
+
+            Integer userId,
+
+            LocalDate day
+    );
 }

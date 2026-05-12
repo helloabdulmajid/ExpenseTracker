@@ -1,56 +1,99 @@
 package com.abdulmajid.expensetracker.controller;
 
-import com.abdulmajid.expensetracker.dto.IncomeRequest;
-import com.abdulmajid.expensetracker.dto.IncomeResponse;
+import com.abdulmajid.expensetracker.dto.request.IncomeRequest;
+import com.abdulmajid.expensetracker.dto.response.IncomeResponse;
 import com.abdulmajid.expensetracker.service.IncomeService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("income")
+@RequestMapping("/users/{userId}/incomes")
+
+@RequiredArgsConstructor
+
 public class IncomeController {
-    @Autowired
-    private IncomeService incomeService;
 
-    @PostMapping("/create/{userId}")
-    public IncomeResponse createIncomeForUser(@Valid @PathVariable Integer userId,
-                                              @RequestBody IncomeRequest incomeRequest) {
-        return incomeService.createIncomeForUser(userId, incomeRequest);
-    }
+    private final IncomeService incomeService;
 
-    @GetMapping("/user/{userId}")
-    public List<IncomeResponse> getAllIncomeForUser(@PathVariable Integer userId) {
-        return incomeService.getAllIncomeForUser(userId);
-    }
+    // CREATE INCOME
+    @PostMapping
+    public ResponseEntity<IncomeResponse> createIncomeForUser(
 
-    @GetMapping("/{incomeId}")
-    public IncomeResponse getIncome(@PathVariable Integer incomeId) {
-        return incomeService.getIncome(incomeId);
-    }
-
-    @GetMapping("/all")
-    public List<IncomeResponse> getAllIncome() {
-        return incomeService.getAllIncome();
-    }
-
-    @PutMapping("/update/user/{userId}/income/{incomeId}")
-    public String updateIncome(
             @PathVariable Integer userId,
+
+            @Valid @RequestBody IncomeRequest incomeRequest
+    ) {
+
+        IncomeResponse response =
+                incomeService.createIncomeForUser(userId, incomeRequest);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
+    }
+
+    // GET ALL USER INCOMES
+    @GetMapping
+    public ResponseEntity<List<IncomeResponse>> getAllIncomeForUser(
+
+            @PathVariable Integer userId
+    ) {
+
+        return ResponseEntity.ok(
+                incomeService.getAllIncomeForUser(userId)
+        );
+    }
+
+    // GET SINGLE INCOME
+    @GetMapping("/{incomeId}")
+    public ResponseEntity<IncomeResponse> getIncome(
+
+            @PathVariable Integer userId,
+
+            @PathVariable Integer incomeId
+    ) {
+
+        return ResponseEntity.ok(
+                incomeService.getIncome(userId, incomeId)
+        );
+    }
+
+    // UPDATE INCOME
+    @PutMapping("/{incomeId}")
+    public ResponseEntity<IncomeResponse> updateIncome(
+
+            @PathVariable Integer userId,
+
             @PathVariable Integer incomeId,
-            @RequestBody IncomeRequest incomeRequest) {
 
-        return incomeService.updateIncome(userId, incomeId, incomeRequest);
+            @Valid @RequestBody IncomeRequest incomeRequest
+    ) {
 
+        return ResponseEntity.ok(
+                incomeService.updateIncome(
+                        userId,
+                        incomeId,
+                        incomeRequest
+                )
+        );
     }
 
-    @DeleteMapping("/delete/user/{userId}/income/{incomeId}")
-    public String deleteIncome(@PathVariable Integer userId,
-                               @PathVariable Integer incomeId) {
-        return incomeService.deleteIncome(userId, incomeId);
-    }
+    // DELETE INCOME
+    @DeleteMapping("/{incomeId}")
+    public ResponseEntity<Void> deleteIncome(
 
+            @PathVariable Integer userId,
+
+            @PathVariable Integer incomeId
+    ) {
+
+        incomeService.deleteIncome(userId, incomeId);
+
+        return ResponseEntity.noContent().build();
+    }
 }
-

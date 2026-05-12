@@ -1,55 +1,99 @@
 package com.abdulmajid.expensetracker.controller;
 
-import com.abdulmajid.expensetracker.dto.DebtRequest;
-import com.abdulmajid.expensetracker.dto.DebtResponse;
+import com.abdulmajid.expensetracker.dto.request.DebtRequest;
+import com.abdulmajid.expensetracker.dto.response.DebtResponse;
 import com.abdulmajid.expensetracker.service.DebtService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("debt")
+@RequestMapping("/users/{userId}/debts")
+
+@RequiredArgsConstructor
+
 public class DebtController {
 
-    @Autowired
-    private DebtService debtService;
+    private final DebtService debtService;
 
-    @PostMapping("/create/{userId}")
-    public DebtResponse createDebtForUser(@PathVariable Integer userId,
-                                          @RequestBody DebtRequest debtRequest) {
-        return debtService.createDebtForUser(userId, debtRequest);
-    }
+    // CREATE DEBT
+    @PostMapping
+    public ResponseEntity<DebtResponse> createDebtForUser(
 
-    @GetMapping("/user/{userId}")
-    public List<DebtResponse> getAllDebtForUser(@PathVariable Integer userId) {
-        return debtService.getAllDebtForUser(userId);
-    }
-
-    @GetMapping("/{debtId}")
-    public DebtResponse getDebt(@PathVariable Integer debtId) {
-        return debtService.getDebt(debtId);
-    }
-
-    @GetMapping("/all")
-    public List<DebtResponse> getAllDebt() {
-        return debtService.getAllDebt();
-    }
-
-    @PutMapping("/update/user/{userId}/debt/{debtId}")
-    public String updateDebt(
             @PathVariable Integer userId,
+
+            @Valid @RequestBody DebtRequest debtRequest
+    ) {
+
+        DebtResponse response =
+                debtService.createDebtForUser(userId, debtRequest);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
+    }
+
+    // GET ALL USER DEBTS
+    @GetMapping
+    public ResponseEntity<List<DebtResponse>> getAllDebtForUser(
+
+            @PathVariable Integer userId
+    ) {
+
+        return ResponseEntity.ok(
+                debtService.getAllDebtForUser(userId)
+        );
+    }
+
+    // GET SINGLE DEBT
+    @GetMapping("/{debtId}")
+    public ResponseEntity<DebtResponse> getDebt(
+
+            @PathVariable Integer userId,
+
+            @PathVariable Integer debtId
+    ) {
+
+        return ResponseEntity.ok(
+                debtService.getDebt(userId, debtId)
+        );
+    }
+
+    // UPDATE DEBT
+    @PutMapping("/{debtId}")
+    public ResponseEntity<DebtResponse> updateDebt(
+
+            @PathVariable Integer userId,
+
             @PathVariable Integer debtId,
-            @RequestBody DebtRequest debtRequest) {
 
-        return debtService.updateDebt(userId, debtId, debtRequest);
+            @Valid @RequestBody DebtRequest debtRequest
+    ) {
 
+        return ResponseEntity.ok(
+                debtService.updateDebt(
+                        userId,
+                        debtId,
+                        debtRequest
+                )
+        );
     }
 
-    @DeleteMapping("/delete/user/{userId}/debt/{debtId}")
-    public String deleteDebt(@PathVariable Integer userId,
-                             @PathVariable Integer debtId) {
-        return debtService.deleteDebt(userId, debtId);
-    }
+    // DELETE DEBT
+    @DeleteMapping("/{debtId}")
+    public ResponseEntity<Void> deleteDebt(
 
+            @PathVariable Integer userId,
+
+            @PathVariable Integer debtId
+    ) {
+
+        debtService.deleteDebt(userId, debtId);
+
+        return ResponseEntity.noContent().build();
+    }
 }

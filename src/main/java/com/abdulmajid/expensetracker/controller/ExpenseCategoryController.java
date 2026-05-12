@@ -1,35 +1,73 @@
 package com.abdulmajid.expensetracker.controller;
 
-import com.abdulmajid.expensetracker.dto.ExpenseCategoryRequest;
-import com.abdulmajid.expensetracker.dto.ExpenseCategoryResponse;
-import com.abdulmajid.expensetracker.model.ExpenseCategory;
+import com.abdulmajid.expensetracker.dto.request.ExpenseCategoryRequest;
+import com.abdulmajid.expensetracker.dto.response.ExpenseCategoryResponse;
 import com.abdulmajid.expensetracker.service.ExpenseCategoryService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("expense")
+@RequestMapping("expense-categories")
+@RequiredArgsConstructor
+
 public class ExpenseCategoryController {
 
-    @Autowired
-    private ExpenseCategoryService expenseCategoryService;
+    private final ExpenseCategoryService expenseCategoryService;
 
-    @PostMapping("/category/create/{userId}")
-    public ResponseEntity<String> createCategoryForUser(@PathVariable Integer userId, @RequestBody ExpenseCategoryRequest expenseCategoryRequest) {
-        expenseCategoryService.createCategoryForUser(userId, expenseCategoryRequest);
-        return ResponseEntity.ok("Category added successfully!");
+    // DEFAULT CATEGORY
+    @GetMapping("/default")
+    public ResponseEntity<List<ExpenseCategoryResponse>>
+    getDefaultCategories() {
+
+        return ResponseEntity.ok(
+                expenseCategoryService.getDefaultCategories()
+        );
     }
 
-    @GetMapping("/categories/{userId}")
-    public List<ExpenseCategory> getCategoriesForUser(@PathVariable Integer userId) {
-        return expenseCategoryService.getCategoriesForUser(userId);
+    // CREATE CATEGORY
+    @PostMapping("/users/{userId}")
+    public ResponseEntity<ExpenseCategoryResponse> createCategoryForUser(
+
+            @PathVariable Integer userId,
+
+            @Valid @RequestBody
+            ExpenseCategoryRequest expenseCategoryRequest
+    ) {
+
+        ExpenseCategoryResponse response =
+                expenseCategoryService.createCategoryForUser(
+                        userId,
+                        expenseCategoryRequest
+                );
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
     }
 
-    @GetMapping("/categories")
-    public List<ExpenseCategoryResponse> getAllCategories() {
-        return expenseCategoryService.getAllCategories();
+    // GET USER CATEGORIES
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<List<ExpenseCategoryResponse>> getCategoriesForUser(
+
+            @PathVariable Integer userId
+    ) {
+
+        return ResponseEntity.ok(
+                expenseCategoryService.getCategoriesForUser(userId)
+        );
+    }
+
+    // GET ALL CATEGORIES
+    @GetMapping("/users/{userId}/all")
+    public ResponseEntity<List<ExpenseCategoryResponse>> getAllCategories() {
+
+        return ResponseEntity.ok(
+                expenseCategoryService.getAllCategories()
+        );
     }
 }

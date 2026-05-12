@@ -4,21 +4,39 @@ import com.abdulmajid.expensetracker.enums.DefaultExpenseCategory;
 import com.abdulmajid.expensetracker.model.ExpenseCategory;
 import com.abdulmajid.expensetracker.repository.ExpenseCategoryRepository;
 import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
+
 public class DefaultExpenseCategoryInitializer {
-    @Autowired
-    private ExpenseCategoryRepository expenseCategoryRepository;
+
+    private final ExpenseCategoryRepository expenseCategoryRepository;
 
     @PostConstruct
     public void initDefaultCategories() {
-        for (DefaultExpenseCategory defaultExpenseCategory : DefaultExpenseCategory.values()) {
-            if (!expenseCategoryRepository.existsByCategoryName(defaultExpenseCategory.name())) {
-                ExpenseCategory expenseCategory = new ExpenseCategory();
-                expenseCategory.setCategoryName(defaultExpenseCategory.name());
+
+        for (DefaultExpenseCategory category
+                : DefaultExpenseCategory.values()) {
+
+            boolean exists =
+                    expenseCategoryRepository
+                            .existsByCategoryName(
+                                    category.name()
+                            );
+
+            if (!exists) {
+
+                ExpenseCategory expenseCategory =
+                        new ExpenseCategory();
+
+                expenseCategory.setCategoryName(
+                        category.name()
+                );
+
                 expenseCategory.setDefaultCategory(true);
+
                 expenseCategoryRepository.save(expenseCategory);
             }
         }

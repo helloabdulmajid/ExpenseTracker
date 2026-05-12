@@ -1,8 +1,8 @@
 package com.abdulmajid.expensetracker.enums;
 
-public enum LoanStatus {
+public enum DebtStatus {
 
-    ACTIVE,
+    OUTSTANDING,
     PAID,
     OVERDUE
 }

@@ -1,43 +1,85 @@
 package com.abdulmajid.expensetracker.model;
 
+import com.abdulmajid.expensetracker.enums.DebtPriority;
+import com.abdulmajid.expensetracker.enums.DebtStatus;
+import com.abdulmajid.expensetracker.model.base.BaseEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "debts")
-public class Debt {
+
+@Getter
+@Setter
+@NoArgsConstructor
+
+public class Debt extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private BigDecimal amount;
-    private String creditor; // Who gives the debt is owed to(Credit card,Bank,person)
-    private String creditorName; // Who gives the debt is owed to(axis flipkart cc,idfc,bob)
-    private String debtor; // Who gives the debt Or A debtor is a company or individual who owes money
-    private String debtorName;   // Name of that debtor
-    private Date dueDate;
-    private String status; // OUTSTANDING, PAID, OVERDUE
-    private String priority; // HIGH, MEDIUM, LOW
-    private Boolean isRecurring; // True for recurring debts like credit card emi
-    private String category; // Medical, Utility, Credit Card
-    private String note;
-    private String day;
-    private String date;
-    private Date createdAt;
-    private Date updatedAt;
 
-    @ManyToOne
+    @NotNull(message = "Amount is required")
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal amount;
+
+    @NotBlank(message = "Creditor is required")
+    private String creditor;
+
+    private String creditorName;
+
+    @NotBlank(message = "Debtor is required")
+    private String debtor;
+
+    private String debtorName;
+
+    @NotNull(message = "Due date is required")
+    private LocalDate dueDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private DebtStatus status;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private DebtPriority priority;
+
+    @Column(nullable = false)
+    private Boolean recurring = false;
+
+    private String category;
+
+    private String note;
+
+    @NotNull(message = "Date is required")
+    private LocalDate date;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public Debt() {
-    }
-
-    public Debt(BigDecimal amount, String creditor, String creditorName,
-                String debtor, String debtorName, Date dueDate, String status,
-                String priority, Boolean isRecurring, String category, String note,
-                String day, String date, User user) {
+    public Debt(
+            BigDecimal amount,
+            String creditor,
+            String creditorName,
+            String debtor,
+            String debtorName,
+            LocalDate dueDate,
+            DebtStatus status,
+            DebtPriority priority,
+            Boolean recurring,
+            String category,
+            String note,
+            LocalDate date,
+            User user
+    ) {
         this.amount = amount;
         this.creditor = creditor;
         this.creditorName = creditorName;
@@ -46,150 +88,10 @@ public class Debt {
         this.dueDate = dueDate;
         this.status = status;
         this.priority = priority;
-        this.isRecurring = isRecurring;
+        this.recurring = recurring;
         this.category = category;
         this.note = note;
-        this.day = day;
         this.date = date;
-        this.createdAt = new Date();
-        this.updatedAt = new Date();
-        this.user = user;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
-    public String getCreditor() {
-        return creditor;
-    }
-
-    public void setCreditor(String creditor) {
-        this.creditor = creditor;
-    }
-
-    public String getCreditorName() {
-        return creditorName;
-    }
-
-    public void setCreditorName(String creditorName) {
-        this.creditorName = creditorName;
-    }
-
-    public String getDebtor() {
-        return debtor;
-    }
-
-    public void setDebtor(String debtor) {
-        this.debtor = debtor;
-    }
-
-    public String getDebtorName() {
-        return debtorName;
-    }
-
-    public void setDebtorName(String debtorName) {
-        this.debtorName = debtorName;
-    }
-
-    public Date getDueDate() {
-        return dueDate;
-    }
-
-    public void setDueDate(Date dueDate) {
-        this.dueDate = dueDate;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getPriority() {
-        return priority;
-    }
-
-    public void setPriority(String priority) {
-        this.priority = priority;
-    }
-
-
-    public Boolean getRecurring() {
-        return isRecurring;
-    }
-
-    public void setRecurring(Boolean recurring) {
-        isRecurring = recurring;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public String getNote() {
-        return note;
-    }
-
-    public void setNote(String note) {
-        this.note = note;
-    }
-
-    public String getDay() {
-        return day;
-    }
-
-    public void setDay(String day) {
-        this.day = day;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Date getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Date updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
         this.user = user;
     }
 }

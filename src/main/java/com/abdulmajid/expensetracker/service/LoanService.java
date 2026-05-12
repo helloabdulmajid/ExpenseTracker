@@ -1,20 +1,45 @@
 package com.abdulmajid.expensetracker.service;
 
-import com.abdulmajid.expensetracker.dto.LoanRequest;
-import com.abdulmajid.expensetracker.dto.LoanResponse;
+import com.abdulmajid.expensetracker.dto.request.LoanRequest;
+import com.abdulmajid.expensetracker.dto.response.LoanResponse;
 
 import java.util.List;
 
 public interface LoanService {
-    LoanResponse createLoanForUser(Integer userId, LoanRequest loanRequest);
 
-    List<LoanResponse> getAllLoanForUser(Integer userId);
+    LoanResponse createLoanForUser(
 
-    LoanResponse getOneLoan(Integer loanId);
+            Integer userId,
+
+            LoanRequest loanRequest
+    );
+
+    List<LoanResponse> getAllLoanForUser(
+            Integer userId
+    );
+
+    LoanResponse getOneLoan(
+
+            Integer userId,
+
+            Integer loanId
+    );
 
     List<LoanResponse> getAllLoans();
 
-    String updateLoan(Integer userId, Integer loanId, LoanRequest loanRequest);
+    LoanResponse updateLoan(
 
-    String deleteLoan(Integer userId, Integer loanId);
+            Integer userId,
+
+            Integer loanId,
+
+            LoanRequest loanRequest
+    );
+
+    void deleteLoan(
+
+            Integer userId,
+
+            Integer loanId
+    );
 }

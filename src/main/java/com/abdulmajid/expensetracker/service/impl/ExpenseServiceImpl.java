@@ -1,8 +1,7 @@
 package com.abdulmajid.expensetracker.service.impl;
 
-import com.abdulmajid.expensetracker.dto.ExpenseCategoryResponse;
-import com.abdulmajid.expensetracker.dto.ExpenseRequest;
-import com.abdulmajid.expensetracker.dto.ExpenseResponse;
+import com.abdulmajid.expensetracker.dto.request.ExpenseRequest;
+import com.abdulmajid.expensetracker.dto.response.ExpenseResponse;
 import com.abdulmajid.expensetracker.exception.custom.CategoryNotFoundException;
 import com.abdulmajid.expensetracker.exception.custom.ExpenseNotFoundException;
 import com.abdulmajid.expensetracker.exception.custom.UserNotFoundException;
@@ -13,306 +12,376 @@ import com.abdulmajid.expensetracker.repository.ExpenseCategoryRepository;
 import com.abdulmajid.expensetracker.repository.ExpenseRepository;
 import com.abdulmajid.expensetracker.repository.UserRepository;
 import com.abdulmajid.expensetracker.service.ExpenseService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
-public class ExpenseServiceImpl implements ExpenseService {
+@RequiredArgsConstructor
 
-    @Autowired
-    private ExpenseRepository expenseRepository;
-    @Autowired
-    private ExpenseCategoryRepository expenseCategoryRepository;
+public class ExpenseServiceImpl
+        implements ExpenseService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final ExpenseRepository expenseRepository;
 
+    private final ExpenseCategoryRepository expenseCategoryRepository;
+
+    private final UserRepository userRepository;
+
+    // CREATE EXPENSE
     @Override
-    public ExpenseResponse createExpense(Integer userId, ExpenseRequest expenseRequest) {
+    public ExpenseResponse createExpense(
 
-        // get user from userId(param)
-        User existsUser = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+            Integer userId,
 
-        //get category from categoryId
-        ExpenseCategory dbExpenseCategory = expenseCategoryRepository.findById(expenseRequest.getCategoryId())
-                .orElseThrow(() -> new CategoryNotFoundException("Category not found with ID: " + expenseRequest.getCategoryId()));
+            ExpenseRequest expenseRequest
+    ) {
 
-        //create expense
-        Expense expense = new Expense(expenseRequest.getAmount(),
+        User user = getUserById(userId);
+
+        ExpenseCategory expenseCategory =
+                getExpenseCategoryById(
+                        expenseRequest.getCategoryId()
+                );
+
+        Expense expense = new Expense(
+                expenseRequest.getAmount(),
                 expenseRequest.getPaymentMode(),
                 expenseRequest.getNote(),
-                expenseRequest.getDay().toUpperCase(),
                 expenseRequest.getDate(),
-                expenseRequest.getCreatedAt(),
-                expenseRequest.getUpdatedAt(),
-                dbExpenseCategory,
-                existsUser);
+                expenseCategory,
+                user
+        );
 
+        Expense savedExpense =
+                expenseRepository.save(expense);
 
-        // Save the expense in to db
-        expenseRepository.save(expense);
-
-        //get Total Expense from user table
-        BigDecimal oldTotalExpense = existsUser.getExpense();
-        BigDecimal newTotalExpense = oldTotalExpense.add(expenseRequest.getAmount());
-
-        //add newTotalExpense in user table
-
-        existsUser.setExpense(newTotalExpense);
-        existsUser.setUpdatedAt(new Date());
-
-        userRepository.save(existsUser);
-
-        // Return ExpenseResponse (with category details)
-
-        ExpenseCategoryResponse expenseCategoryResponse = new ExpenseCategoryResponse(dbExpenseCategory.getId(),
-                dbExpenseCategory.getCategoryName(), dbExpenseCategory.isDefaultCategory());
-
-        return new ExpenseResponse(expense.getId(), expense.getAmount(), expense.getPaymentMode(),
-                expense.getNote(), expense.getDay(), expense.getDate(), expense.getCreatedAt(),
-                expense.getUpdatedAt(), expenseCategoryResponse, existsUser);
-
+        return mapToResponse(savedExpense);
     }
 
+    // GET USER EXPENSES
     @Override
-    public List<ExpenseResponse> getExpenseForUser(Integer userId) {
-        User existsUser = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+    public List<ExpenseResponse> getExpenseForUser(
+            Integer userId
+    ) {
 
-        List<Expense> expenseList = expenseRepository.findByUserId(userId);
-        ArrayList<ExpenseResponse> expenseResponses = new ArrayList<>();
+        getUserById(userId);
 
-        for (Expense expense : expenseList) {
-            ExpenseResponse expenseResponse = new ExpenseResponse(expense.getId(), expense.getAmount(),
-                    expense.getPaymentMode(), expense.getNote(), expense.getDay(), expense.getDate(),
-                    expense.getCreatedAt(), expense.getUpdatedAt(),
-                    new ExpenseCategoryResponse(expense.getCategory().getId(),
-                            expense.getCategory().getCategoryName(),
-                            expense.getCategory().isDefaultCategory()));
-
-            expenseResponses.add(expenseResponse);
-        }
-        return expenseResponses;
+        return expenseRepository.findByUserId(userId)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
+    // GET SINGLE EXPENSE
     @Override
-    public ExpenseResponse getExpense(Integer expenseId) {
-        Expense existsExpense = expenseRepository.findById(expenseId)
-                .orElseThrow(() -> new ExpenseNotFoundException("Expense Not found with Income Id:  " + expenseId));
+    public ExpenseResponse getExpense(
 
-        ExpenseCategory dbExpenseCategory = expenseCategoryRepository.findById(existsExpense.getCategory().getId())
-                .orElseThrow(() -> new CategoryNotFoundException("Expense Category Not Found"));
+            Integer userId,
 
+            Integer expenseId
+    ) {
 
-        ExpenseCategoryResponse expenseCategoryResponse = new ExpenseCategoryResponse(dbExpenseCategory.getId(),
-                dbExpenseCategory.getCategoryName(), dbExpenseCategory.isDefaultCategory());
+        Expense expense =
+                getExpenseByIdAndUserId(
+                        expenseId,
+                        userId
+                );
 
-        return new ExpenseResponse(existsExpense.getId(), existsExpense.getAmount(), existsExpense.getPaymentMode(),
-                existsExpense.getNote(), existsExpense.getDay(), existsExpense.getDate(), existsExpense.getCreatedAt(),
-                existsExpense.getUpdatedAt(), expenseCategoryResponse);
+        return mapToResponse(expense);
     }
 
+    // GET ALL EXPENSES
     @Override
     public List<ExpenseResponse> getAllExpense() {
-        List<Expense> allExpense = expenseRepository.findAll();
-        ArrayList<ExpenseResponse> expenseResponses = new ArrayList<>();
 
-        for (Expense expense : allExpense) {
-            ExpenseResponse expenseResponse = new ExpenseResponse(expense.getId(), expense.getAmount(),
-                    expense.getPaymentMode(), expense.getNote(), expense.getDay(), expense.getDate(),
-                    expense.getCreatedAt(), expense.getUpdatedAt(),
-                    new ExpenseCategoryResponse(expense.getCategory().getId(),
-                            expense.getCategory().getCategoryName(),
-                            expense.getCategory().isDefaultCategory()));
-
-            expenseResponses.add(expenseResponse);
-        }
-        return expenseResponses;
+        return expenseRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
+    // UPDATE EXPENSE
     @Override
-    public String updateExpense(Integer userId, Integer expenseId, ExpenseRequest expenseRequest) {
+    public ExpenseResponse updateExpense(
 
-        User existsUser = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+            Integer userId,
 
-        //get Expense from expenseId
-        Expense existsExpense = expenseRepository.findById(expenseId)
-                .orElseThrow(() -> new ExpenseNotFoundException("Expense Not found with Expense Id:  " + expenseId));
+            Integer expenseId,
 
-        BigDecimal oldAmount = existsExpense.getAmount();
-        BigDecimal newAmount = expenseRequest.getAmount();
+            ExpenseRequest expenseRequest
+    ) {
 
-        ExpenseCategory dbExpenseCategory = expenseCategoryRepository.findById(existsExpense.getCategory().getId())
-                .orElseThrow(() -> new CategoryNotFoundException("Expense Category not found " + existsExpense.getCategory().getId()));
+        Expense expense =
+                getExpenseByIdAndUserId(
+                        expenseId,
+                        userId
+                );
 
+        ExpenseCategory expenseCategory =
+                getExpenseCategoryById(
+                        expenseRequest.getCategoryId()
+                );
 
-        // If new amount is the same as old, just update the Expense all records and return
-        if (newAmount.compareTo(oldAmount) == 0) {
-            existsExpense.setCategory(dbExpenseCategory);
-            existsExpense.setNote(expenseRequest.getNote());
-            existsExpense.setUpdatedAt(new Date());
+        expense.setAmount(
+                expenseRequest.getAmount()
+        );
 
-            expenseRepository.save(existsExpense);
-            return "Expense Updated SuccessFully , Expense Id :" + expenseId; //  Exit the function early (no need to update user's Expense)
-        }
+        expense.setPaymentMode(
+                expenseRequest.getPaymentMode()
+        );
 
-        // if NewAmount is greater than old Amount → Add the difference to user table
+        expense.setNote(
+                expenseRequest.getNote()
+        );
 
-        if (newAmount.compareTo(oldAmount) > 0) {
-            BigDecimal difference = newAmount.subtract(oldAmount);
-            existsUser.setExpense(existsUser.getExpense().add(difference));
-        } else {
-            // if New amount is smaller → Subtract the difference
-            BigDecimal difference = oldAmount.subtract(newAmount);
+        expense.setDate(
+                expenseRequest.getDate()
+        );
 
-            if (existsUser.getExpense().subtract(difference).compareTo(BigDecimal.ZERO) < 0) {
-                throw new ExpenseNotFoundException("Not enough balance to update this Expense");
-            }
+        expense.setExpenseCategory(
+                expenseCategory
+        );
 
-            existsUser.setExpense(existsUser.getExpense().subtract(difference));
-        }
+        Expense updatedExpense =
+                expenseRepository.save(expense);
 
-        // Update the Expense record
-        existsExpense.setAmount(newAmount);
-        existsExpense.setCategory(dbExpenseCategory);
-        existsExpense.setNote(expenseRequest.getNote());
-        existsExpense.setUpdatedAt(new Date());
-
-        // Save updates
-        expenseRepository.save(existsExpense);
-        existsUser.setUpdatedAt(new Date());
-        userRepository.save(existsUser);
-
-        return "Expense Updated SuccessFully , Expense Id :" + expenseId;
+        return mapToResponse(updatedExpense);
     }
 
+    // DELETE EXPENSE
     @Override
-    public String deleteExpense(Integer userId, Integer expenseId) {
-        User existsUser = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+    public void deleteExpense(
 
-        Expense existsExpense = expenseRepository.findById(expenseId)
-                .orElseThrow(() -> new ExpenseNotFoundException("Expense Not found with Expense Id:  " + expenseId));
+            Integer userId,
 
-        BigDecimal expenseAmount = existsExpense.getAmount();
+            Integer expenseId
+    ) {
 
-        try {
-            existsUser.setExpense(existsUser.getExpense().subtract(expenseAmount));
+        Expense expense =
+                getExpenseByIdAndUserId(
+                        expenseId,
+                        userId
+                );
 
-            // Remove Expense record
-            expenseRepository.delete(existsExpense);
-            userRepository.save(existsUser);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return "Deleted Expense Id : -> " + expenseId;
+        expenseRepository.delete(expense);
     }
 
+    // MONTHLY EXPENSES
     @Override
-    public List<ExpenseResponse> getMonthlyExpenses(Integer userId, Integer month) {
-        User existsUser = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+    public List<ExpenseResponse> getMonthlyExpenses(
 
-        LocalDate firstDay = LocalDate.of(LocalDate.now().getYear(), month, 1);
-        LocalDate lastDay = firstDay.withDayOfMonth(firstDay.lengthOfMonth());
+            Integer userId,
 
-        List<Expense> expenses = expenseRepository.findByUserIdAndDateBetween(userId, firstDay, lastDay);
-        if (expenses.isEmpty()) {
-            throw new ExpenseNotFoundException("Expenses not found for the given Month.");
-        }
-        return expenses.stream()
-                .map(expense -> new ExpenseResponse(
-                        expense.getId(),
-                        expense.getAmount(),
-                        expense.getPaymentMode(),
-                        expense.getNote(),
-                        expense.getDay(),
-                        expense.getDate(),
-                        expense.getCreatedAt(),
-                        expense.getUpdatedAt(),
-                        new ExpenseCategoryResponse(
-                                expense.getCategory().getId(),
-                                expense.getCategory().getCategoryName(),
-                                expense.getCategory().isDefaultCategory()
-                        )
-                ))
-                .collect(Collectors.toList());
+            Integer month
+    ) {
 
-    }
+        getUserById(userId);
 
-    @Override
-    public List<ExpenseResponse> getWeeklyExpenses(Integer userId, Integer week) {
-        User existsUser = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+        LocalDate firstDay =
+                LocalDate.of(
+                        LocalDate.now().getYear(),
+                        month,
+                        1
+                );
 
-        LocalDate today = LocalDate.now();
-        LocalDate firstDayOfYear = LocalDate.of(today.getYear(), 1, 1);
+        LocalDate lastDay =
+                firstDay.withDayOfMonth(
+                        firstDay.lengthOfMonth()
+                );
 
-        // Find start and end date of the week
-        LocalDate startOfWeek = firstDayOfYear.plusWeeks(week - 1).with(DayOfWeek.MONDAY);
-        LocalDate endOfWeek = startOfWeek.plusDays(6);
-
-        List<Expense> expenses = expenseRepository.findByUserIdAndDateBetween(userId, startOfWeek, endOfWeek);
-        if (expenses.isEmpty()) {
-            throw new ExpenseNotFoundException("Expenses not found for the given Month.");
-        }
-        return expenses.stream()
-                .map(expense -> new ExpenseResponse(
-                        expense.getId(),
-                        expense.getAmount(),
-                        expense.getPaymentMode(),
-                        expense.getNote(),
-                        expense.getDay(),
-                        expense.getDate(),
-                        expense.getCreatedAt(),
-                        expense.getUpdatedAt(),
-                        new ExpenseCategoryResponse(
-                                expense.getCategory().getId(),
-                                expense.getCategory().getCategoryName(),
-                                expense.getCategory().isDefaultCategory()
-                        )
-                ))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<ExpenseResponse> getDailyExpenses(Integer userId, LocalDate day) {
-        User existsUser = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
-
-        List<Expense> expenses = expenseRepository.findByUserIdAndDate(userId, day);
+        List<Expense> expenses =
+                expenseRepository.findByUserIdAndDateBetween(
+                        userId,
+                        firstDay,
+                        lastDay
+                );
 
         if (expenses.isEmpty()) {
-            throw new ExpenseNotFoundException("Expenses not found for the given Day.");
+
+            throw new ExpenseNotFoundException(
+                    "No expenses found for this month"
+            );
         }
+
         return expenses.stream()
-                .map(expense -> new ExpenseResponse(
-                        expense.getId(),
-                        expense.getAmount(),
-                        expense.getPaymentMode(),
-                        expense.getNote(),
-                        expense.getDay(),
-                        expense.getDate(),
-                        expense.getCreatedAt(),
-                        expense.getUpdatedAt(),
-                        new ExpenseCategoryResponse(
-                                expense.getCategory().getId(),
-                                expense.getCategory().getCategoryName(),
-                                expense.getCategory().isDefaultCategory()
-                        )
-                ))
-                .collect(Collectors.toList());
+                .map(this::mapToResponse)
+                .toList();
     }
 
+    // WEEKLY EXPENSES
+    @Override
+    public List<ExpenseResponse> getWeeklyExpenses(
 
+            Integer userId,
+
+            Integer week
+    ) {
+
+        getUserById(userId);
+
+        LocalDate firstDayOfYear =
+                LocalDate.of(
+                        LocalDate.now().getYear(),
+                        1,
+                        1
+                );
+
+        LocalDate startOfWeek =
+                firstDayOfYear
+                        .plusWeeks(week - 1)
+                        .with(DayOfWeek.MONDAY);
+
+        LocalDate endOfWeek =
+                startOfWeek.plusDays(6);
+
+        List<Expense> expenses =
+                expenseRepository.findByUserIdAndDateBetween(
+                        userId,
+                        startOfWeek,
+                        endOfWeek
+                );
+
+        if (expenses.isEmpty()) {
+
+            throw new ExpenseNotFoundException(
+                    "No expenses found for this week"
+            );
+        }
+
+        return expenses.stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    // DAILY EXPENSES
+    @Override
+    public List<ExpenseResponse> getDailyExpenses(
+
+            Integer userId,
+
+            LocalDate day
+    ) {
+
+        getUserById(userId);
+
+        List<Expense> expenses =
+                expenseRepository.findByUserIdAndDate(
+                        userId,
+                        day
+                );
+
+        if (expenses.isEmpty()) {
+
+            throw new ExpenseNotFoundException(
+                    "No expenses found for this day"
+            );
+        }
+
+        return expenses.stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    // HELPER METHOD
+    private User getUserById(
+            Integer userId
+    ) {
+
+        return userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new UserNotFoundException(
+                                "User not found with ID: "
+                                        + userId
+                        )
+                );
+    }
+
+    // HELPER METHOD
+    private ExpenseCategory getExpenseCategoryById(
+            Integer categoryId
+    ) {
+
+        return expenseCategoryRepository.findById(categoryId)
+                .orElseThrow(() ->
+                        new CategoryNotFoundException(
+                                "Expense category not found with ID: "
+                                        + categoryId
+                        )
+                );
+    }
+
+    // HELPER METHOD
+    private Expense getExpenseByIdAndUserId(
+
+            Integer expenseId,
+
+            Integer userId
+    ) {
+
+        return expenseRepository.findByIdAndUserId(
+                        expenseId,
+                        userId
+                )
+                .orElseThrow(() ->
+                        new ExpenseNotFoundException(
+                                "Expense not found with ID: "
+                                        + expenseId
+                        )
+                );
+    }
+
+    // MAPPER METHOD
+    private ExpenseResponse mapToResponse(
+            Expense expense
+    ) {
+
+        ExpenseResponse response =
+                new ExpenseResponse();
+
+        response.setId(
+                expense.getId()
+        );
+
+        response.setAmount(
+                expense.getAmount()
+        );
+
+        response.setPaymentMode(
+                expense.getPaymentMode()
+        );
+
+        response.setNote(
+                expense.getNote()
+        );
+
+        response.setDate(
+                expense.getDate()
+        );
+
+        response.setCategoryId(
+                expense.getExpenseCategory().getId()
+        );
+
+        response.setCategoryName(
+                expense.getExpenseCategory().getCategoryName()
+        );
+
+        response.setUserId(
+                expense.getUser().getId()
+        );
+
+        response.setCreatedAt(
+                expense.getCreatedAt()
+        );
+
+        response.setUpdatedAt(
+                expense.getUpdatedAt()
+        );
+
+        return response;
+    }
 }

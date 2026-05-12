@@ -1,45 +1,82 @@
 package com.abdulmajid.expensetracker.controller;
 
-import com.abdulmajid.expensetracker.dto.UserRequest;
-import com.abdulmajid.expensetracker.dto.UserResponse;
+import com.abdulmajid.expensetracker.dto.request.UserRequest;
+import com.abdulmajid.expensetracker.dto.response.UserResponse;
 import com.abdulmajid.expensetracker.service.UserService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("user")
+@RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
+    // CREATE USER
     @PostMapping("/signup")
-    public UserResponse createUser(@RequestBody @Valid UserRequest userRequest) {
-        return userService.createUser(userRequest);
+    public ResponseEntity<UserResponse> createUser(
 
+            @Valid @RequestBody UserRequest userRequest
+    ) {
+
+        UserResponse response =
+                userService.createUser(userRequest);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
     }
 
+    // GET SINGLE USER
     @GetMapping("/{userId}")
-    public UserResponse getOneUser(@PathVariable Integer userId) {
-        return userService.getOneUser(userId);
+    public ResponseEntity<UserResponse> getOneUser(
+
+            @PathVariable Integer userId
+    ) {
+
+        return ResponseEntity.ok(
+                userService.getOneUser(userId)
+        );
     }
 
+    // GET ALL USERS
+    @GetMapping
+    public ResponseEntity<List<UserResponse>> getAllUsers() {
 
-    @GetMapping("/allusers")
-    public List<UserResponse> getAllUsers() {
-        return userService.getAllUsers();
+        return ResponseEntity.ok(
+                userService.getAllUsers()
+        );
     }
 
+    // UPDATE USER
     @PutMapping("/{userId}")
-    public UserResponse updateUser(@PathVariable Integer userId, @RequestBody UserRequest userRequest) {
-        return userService.updateUser(userId, userRequest);
+    public ResponseEntity<UserResponse> updateUser(
+
+            @PathVariable Integer userId,
+
+            @Valid @RequestBody UserRequest userRequest
+    ) {
+
+        return ResponseEntity.ok(
+                userService.updateUser(userId, userRequest)
+        );
     }
 
-    @DeleteMapping("/delete/{userId}")
-    public String deleteUser(@PathVariable Integer userId) {
-        return userService.deleteUser(userId);
+    // DELETE USER
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> deleteUser(
+
+            @PathVariable Integer userId
+    ) {
+
+        userService.deleteUser(userId);
+
+        return ResponseEntity.noContent().build();
     }
 }

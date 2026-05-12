@@ -1,16 +1,24 @@
 package com.abdulmajid.expensetracker.service;
 
-import com.abdulmajid.expensetracker.dto.ExpenseCategoryRequest;
-import com.abdulmajid.expensetracker.dto.ExpenseCategoryResponse;
-import com.abdulmajid.expensetracker.model.ExpenseCategory;
+import com.abdulmajid.expensetracker.dto.request.ExpenseCategoryRequest;
+import com.abdulmajid.expensetracker.dto.response.ExpenseCategoryResponse;
 
 import java.util.List;
 
 public interface ExpenseCategoryService {
 
-    public List<ExpenseCategory> getCategoriesForUser(Integer userId);
+    List<ExpenseCategoryResponse> getCategoriesForUser(
+            Integer userId
+    );
 
-    public void createCategoryForUser(Integer userId, ExpenseCategoryRequest expenseCategoryRequest);
+    ExpenseCategoryResponse createCategoryForUser(
 
-    public List<ExpenseCategoryResponse> getAllCategories();
+            Integer userId,
+
+            ExpenseCategoryRequest expenseCategoryRequest
+    );
+
+    List<ExpenseCategoryResponse> getAllCategories();
+
+    List<ExpenseCategoryResponse> getDefaultCategories();
 }

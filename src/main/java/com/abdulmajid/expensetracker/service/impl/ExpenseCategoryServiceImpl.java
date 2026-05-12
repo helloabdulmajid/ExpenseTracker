@@ -1,14 +1,14 @@
 package com.abdulmajid.expensetracker.service.impl;
 
-import com.abdulmajid.expensetracker.dto.request.IncomeCategoryRequest;
-import com.abdulmajid.expensetracker.dto.response.IncomeCategoryResponse;
+import com.abdulmajid.expensetracker.dto.request.ExpenseCategoryRequest;
+import com.abdulmajid.expensetracker.dto.response.ExpenseCategoryResponse;
 import com.abdulmajid.expensetracker.exception.custom.CategoryNotFoundException;
 import com.abdulmajid.expensetracker.exception.custom.UserNotFoundException;
-import com.abdulmajid.expensetracker.model.IncomeCategory;
+import com.abdulmajid.expensetracker.model.ExpenseCategory;
 import com.abdulmajid.expensetracker.model.User;
-import com.abdulmajid.expensetracker.repository.IncomeCategoryRepository;
+import com.abdulmajid.expensetracker.repository.ExpenseCategoryRepository;
 import com.abdulmajid.expensetracker.repository.UserRepository;
-import com.abdulmajid.expensetracker.service.IncomeCategoryService;
+import com.abdulmajid.expensetracker.service.ExpenseCategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,24 +17,22 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 
-public class IncomeCategoryServiceImpl
-        implements IncomeCategoryService {
-
-    private final IncomeCategoryRepository incomeCategoryRepository;
+public class ExpenseCategoryServiceImpl
+        implements ExpenseCategoryService {
 
     private final UserRepository userRepository;
 
+    private final ExpenseCategoryRepository expenseCategoryRepository;
+
     // GET USER CATEGORIES
     @Override
-    public List<IncomeCategoryResponse>
-    getIncomeCategoriesForUser(
+    public List<ExpenseCategoryResponse> getCategoriesForUser(
             Integer userId
     ) {
 
         getUserById(userId);
 
-        return incomeCategoryRepository
-                .findByUserId(userId)
+        return expenseCategoryRepository.findByUserId(userId)
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -42,62 +40,45 @@ public class IncomeCategoryServiceImpl
 
     // CREATE CATEGORY
     @Override
-    public IncomeCategoryResponse
-    createIncomeCategoryForUser(
+    public ExpenseCategoryResponse createCategoryForUser(
 
             Integer userId,
 
-            IncomeCategoryRequest incomeCategoryRequest
+            ExpenseCategoryRequest expenseCategoryRequest
     ) {
 
         User user = getUserById(userId);
 
         validateCategory(
-                incomeCategoryRequest.getCategoryName(),
+                expenseCategoryRequest.getCategoryName(),
                 user
         );
 
-        IncomeCategory incomeCategory =
-                new IncomeCategory();
+        ExpenseCategory expenseCategory =
+                new ExpenseCategory();
 
-        incomeCategory.setCategoryName(
-                incomeCategoryRequest
+        expenseCategory.setCategoryName(
+                expenseCategoryRequest
                         .getCategoryName()
                         .trim()
                         .toUpperCase()
         );
 
-        incomeCategory.setDefaultCategory(false);
+        expenseCategory.setDefaultCategory(false);
 
-        incomeCategory.setUser(user);
+        expenseCategory.setUser(user);
 
-        IncomeCategory savedCategory =
-                incomeCategoryRepository.save(
-                        incomeCategory
-                );
+        ExpenseCategory savedCategory =
+                expenseCategoryRepository.save(expenseCategory);
 
         return mapToResponse(savedCategory);
     }
 
     // GET ALL CATEGORIES
     @Override
-    public List<IncomeCategoryResponse>
-    getAllCategories() {
+    public List<ExpenseCategoryResponse> getAllCategories() {
 
-        return incomeCategoryRepository
-                .findAll()
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
-    }
-
-    // GET DEFAULT CATEGORIES
-    @Override
-    public List<IncomeCategoryResponse>
-    getDefaultCategories() {
-
-        return incomeCategoryRepository
-                .findByDefaultCategoryTrue()
+        return expenseCategoryRepository.findAll()
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -131,55 +112,65 @@ public class IncomeCategoryServiceImpl
                         .toUpperCase();
 
         boolean defaultCategoryExists =
-                incomeCategoryRepository
+                expenseCategoryRepository
                         .existsByCategoryNameAndDefaultCategory(
                                 normalizedCategory,
                                 true
                         );
 
         boolean userCategoryExists =
-                incomeCategoryRepository
+                expenseCategoryRepository
                         .existsByCategoryNameAndUser(
                                 normalizedCategory,
                                 user
                         );
 
-        if (defaultCategoryExists
-                || userCategoryExists) {
+        if (defaultCategoryExists || userCategoryExists) {
 
             throw new CategoryNotFoundException(
-                    "Income category already exists"
+                    "Expense category already exists"
             );
         }
     }
 
     // MAPPER METHOD
-    private IncomeCategoryResponse mapToResponse(
-            IncomeCategory incomeCategory
+    private ExpenseCategoryResponse mapToResponse(
+            ExpenseCategory expenseCategory
     ) {
 
-        IncomeCategoryResponse response =
-                new IncomeCategoryResponse();
+        ExpenseCategoryResponse response =
+                new ExpenseCategoryResponse();
 
         response.setId(
-                incomeCategory.getId()
+                expenseCategory.getId()
         );
 
         response.setCategoryName(
-                incomeCategory.getCategoryName()
+                expenseCategory.getCategoryName()
         );
 
         response.setDefaultCategory(
-                incomeCategory.isDefaultCategory()
+                expenseCategory.isDefaultCategory()
         );
 
-        if (incomeCategory.getUser() != null) {
+        if (expenseCategory.getUser() != null) {
 
             response.setUserId(
-                    incomeCategory.getUser().getId()
+                    expenseCategory.getUser().getId()
             );
         }
 
         return response;
+    }
+
+    @Override
+    public List<ExpenseCategoryResponse>
+    getDefaultCategories() {
+
+        return expenseCategoryRepository
+                .findByDefaultCategoryTrue()
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 }

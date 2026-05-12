@@ -1,20 +1,36 @@
 package com.abdulmajid.expensetracker.service;
 
-import com.abdulmajid.expensetracker.dto.IncomeRequest;
-import com.abdulmajid.expensetracker.dto.IncomeResponse;
+import com.abdulmajid.expensetracker.dto.request.IncomeRequest;
+import com.abdulmajid.expensetracker.dto.response.IncomeResponse;
 
 import java.util.List;
 
 public interface IncomeService {
-    public IncomeResponse createIncomeForUser(Integer userId, IncomeRequest incomeRequest);
 
-    List<IncomeResponse> getAllIncomeForUser(Integer userId);
+    IncomeResponse createIncomeForUser(
+            Integer userId,
+            IncomeRequest incomeRequest
+    );
 
-    String updateIncome(Integer userId, Integer incomeId, IncomeRequest incomeRequest);
+    List<IncomeResponse> getAllIncomeForUser(
+            Integer userId
+    );
 
-    IncomeResponse getIncome(Integer incomeId);
-
-    String deleteIncome(Integer userId, Integer incomeId);
+    IncomeResponse getIncome(
+            Integer userId,
+            Integer incomeId
+    );
 
     List<IncomeResponse> getAllIncome();
+
+    IncomeResponse updateIncome(
+            Integer userId,
+            Integer incomeId,
+            IncomeRequest incomeRequest
+    );
+
+    void deleteIncome(
+            Integer userId,
+            Integer incomeId
+    );
 }

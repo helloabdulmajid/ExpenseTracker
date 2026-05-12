@@ -1,76 +1,43 @@
 package com.abdulmajid.expensetracker.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.abdulmajid.expensetracker.model.base.BaseEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "expense_categories")
-public class ExpenseCategory {
+
+@Getter
+@Setter
+@NoArgsConstructor
+
+public class ExpenseCategory extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @NotBlank(message = "Category name is required")
     @Column(nullable = false)
     private String categoryName;
 
     @Column(nullable = false)
-    private boolean isDefaultCategory;
-    @JsonManagedReference
+    private boolean defaultCategory;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = true) // User can be null for default categories
+    @JoinColumn(name = "user_id")
     private User user;
 
-    // Constructors
-    public ExpenseCategory() {
-    }
-
-    public ExpenseCategory(Integer id, String categoryName, boolean isDefaultCategory, User user) {
-        this.id = id;
+    public ExpenseCategory(
+            String categoryName,
+            boolean defaultCategory,
+            User user
+    ) {
         this.categoryName = categoryName;
-        this.isDefaultCategory = isDefaultCategory;
+        this.defaultCategory = defaultCategory;
         this.user = user;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getCategoryName() {
-        return categoryName;
-    }
-
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
-    }
-
-    public boolean isDefaultCategory() {
-        return isDefaultCategory;
-    }
-
-    public void setDefaultCategory(boolean defaultCategory) {
-        isDefaultCategory = defaultCategory;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    @Override
-    public String toString() {
-        return "Category{" +
-                "id=" + id +
-                ", name='" + categoryName + '\'' +
-                ", isDefaultCategory=" + isDefaultCategory +
-                ", user=" + user +
-                '}';
     }
 }

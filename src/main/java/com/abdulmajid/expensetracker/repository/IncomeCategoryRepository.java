@@ -1,24 +1,35 @@
 package com.abdulmajid.expensetracker.repository;
 
-import com.abdulmajid.expensetracker.model.Income;
 import com.abdulmajid.expensetracker.model.IncomeCategory;
 import com.abdulmajid.expensetracker.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
-public interface IncomeCategoryRepository extends JpaRepository<IncomeCategory, Integer> {
-    // Custom query method to check if a category exists by its name
-    boolean existsByCategoryName(String name);
+public interface IncomeCategoryRepository
+        extends JpaRepository<IncomeCategory, Integer> {
 
-    boolean existsByCategoryNameAndUser(String name, User user);
+    boolean existsByCategoryName(
+            String categoryName
+    );
 
-    Income findByCategoryName(String name);
+    boolean existsByCategoryNameAndUser(
 
-    boolean existsByCategoryNameAndIsDefaultCategory(String name, boolean isDefault);
+            String categoryName,
 
-    List<IncomeCategory> findByUserId(Integer userId);
+            User user
+    );
 
+    boolean existsByCategoryNameAndDefaultCategory(
+
+            String categoryName,
+
+            boolean defaultCategory
+    );
+
+    List<IncomeCategory> findByUserId(
+            Integer userId
+    );
+
+    List<IncomeCategory> findByDefaultCategoryTrue();
 }
