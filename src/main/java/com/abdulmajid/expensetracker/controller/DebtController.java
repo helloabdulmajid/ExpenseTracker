@@ -3,6 +3,7 @@ package com.abdulmajid.expensetracker.controller;
 import com.abdulmajid.expensetracker.dto.request.DebtRequest;
 import com.abdulmajid.expensetracker.dto.response.DebtResponse;
 import com.abdulmajid.expensetracker.service.DebtService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,7 +16,10 @@ import java.util.List;
 @RequestMapping("/users/{userId}/debts")
 
 @RequiredArgsConstructor
-
+@Tag(
+        name = "Debt APIs",
+        description = "Manage user debts"
+)
 public class DebtController {
 
     private final DebtService debtService;

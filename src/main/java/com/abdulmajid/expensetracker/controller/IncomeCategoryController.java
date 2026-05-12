@@ -3,6 +3,7 @@ package com.abdulmajid.expensetracker.controller;
 import com.abdulmajid.expensetracker.dto.request.IncomeCategoryRequest;
 import com.abdulmajid.expensetracker.dto.response.IncomeCategoryResponse;
 import com.abdulmajid.expensetracker.service.IncomeCategoryService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,7 +16,10 @@ import java.util.List;
 @RequestMapping("income-categories")
 
 @RequiredArgsConstructor
-
+@Tag(
+        name = "Income Category APIs",
+        description = "Manage Income categories"
+)
 public class IncomeCategoryController {
 
     private final IncomeCategoryService incomeCategoryService;

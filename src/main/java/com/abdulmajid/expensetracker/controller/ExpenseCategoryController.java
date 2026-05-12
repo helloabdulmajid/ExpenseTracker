@@ -3,6 +3,7 @@ package com.abdulmajid.expensetracker.controller;
 import com.abdulmajid.expensetracker.dto.request.ExpenseCategoryRequest;
 import com.abdulmajid.expensetracker.dto.response.ExpenseCategoryResponse;
 import com.abdulmajid.expensetracker.service.ExpenseCategoryService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,7 +15,10 @@ import java.util.List;
 @RestController
 @RequestMapping("expense-categories")
 @RequiredArgsConstructor
-
+@Tag(
+        name = "Expense Category APIs",
+        description = "Manage expense categories"
+)
 public class ExpenseCategoryController {
 
     private final ExpenseCategoryService expenseCategoryService;

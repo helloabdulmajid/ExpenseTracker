@@ -3,6 +3,8 @@ package com.abdulmajid.expensetracker.controller;
 import com.abdulmajid.expensetracker.dto.request.UserRequest;
 import com.abdulmajid.expensetracker.dto.response.UserResponse;
 import com.abdulmajid.expensetracker.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,12 +16,20 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
+@Tag(
+        name = "User APIs",
+        description = "Operations related to users"
+)
 public class UserController {
 
     private final UserService userService;
 
     // CREATE USER
     @PostMapping("/signup")
+    @Operation(
+            summary = "Create user",
+            description = "Register a new user"
+    )
     public ResponseEntity<UserResponse> createUser(
 
             @Valid @RequestBody UserRequest userRequest

@@ -3,6 +3,7 @@ package com.abdulmajid.expensetracker.controller;
 import com.abdulmajid.expensetracker.dto.request.ExpenseRequest;
 import com.abdulmajid.expensetracker.dto.response.ExpenseResponse;
 import com.abdulmajid.expensetracker.service.ExpenseService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -16,7 +17,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/users/{userId}/expenses")
 @RequiredArgsConstructor
-
+@Tag(
+        name = "Expense APIs",
+        description = "Manage user expenses"
+)
 public class ExpenseController {
 
     private final ExpenseService expenseService;
