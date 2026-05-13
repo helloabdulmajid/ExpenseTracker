@@ -1,10 +1,13 @@
 package com.abdulmajid.expensetracker.config;
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -17,32 +20,90 @@ public class OpenApiConfig {
 
         return new OpenAPI()
 
-                .info(new Info()
+                .info(
 
-                        .title("Expense Tracker API")
+                        new Info()
 
-                        .description(
-                                "REST API for Expense Tracker Application"
-                        )
+                                .title(
+                                        "Expense Tracker API"
+                                )
 
-                        .version("1.0")
+                                .description(
+                                        "REST API for Expense Tracker Application"
+                                )
 
-                        .contact(new Contact()
+                                .version(
+                                        "1.0"
+                                )
 
-                                .name("Abdul Majid")
+                                .contact(
 
-                                .email("abdul@example.com")
-                        )
+                                        new Contact()
 
-                        .license(new License()
+                                                .name(
+                                                        "Abdul Majid"
+                                                )
 
-                                .name("Apache 2.0")
-                        )
+                                                .email(
+                                                        "abdul@example.com"
+                                                )
+                                )
+
+                                .license(
+
+                                        new License()
+
+                                                .name(
+                                                        "Apache 2.0"
+                                                )
+                                )
                 )
 
-                .externalDocs(new ExternalDocumentation()
+                .externalDocs(
 
-                        .description("Project Documentation")
+                        new ExternalDocumentation()
+
+                                .description(
+                                        "Project Documentation"
+                                )
+                )
+
+                // JWT SECURITY 🔥
+                .addSecurityItem(
+
+                        new SecurityRequirement()
+
+                                .addList(
+                                        "bearerAuth"
+                                )
+                )
+
+                .components(
+
+                        new Components()
+
+                                .addSecuritySchemes(
+
+                                        "bearerAuth",
+
+                                        new SecurityScheme()
+
+                                                .name(
+                                                        "bearerAuth"
+                                                )
+
+                                                .type(
+                                                        SecurityScheme.Type.HTTP
+                                                )
+
+                                                .scheme(
+                                                        "bearer"
+                                                )
+
+                                                .bearerFormat(
+                                                        "JWT"
+                                                )
+                                )
                 );
     }
 }
