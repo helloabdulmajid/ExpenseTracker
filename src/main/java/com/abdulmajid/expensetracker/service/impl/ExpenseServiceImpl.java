@@ -234,6 +234,88 @@ public class ExpenseServiceImpl
                 .toList();
     }
 
+    //new update without user id
+
+    @Override
+    public ExpenseResponse updateExpense(
+
+            Integer expenseId,
+
+            ExpenseRequest expenseRequest
+    ) {
+
+        // GET CURRENT USER EMAIL
+        String email =
+                SecurityUtils.getCurrentUserEmail();
+
+        // FIND CURRENT USER
+        User user = userRepository
+                .findByEmail(email)
+                .orElseThrow(() ->
+                        new UserNotFoundException(
+                                "User not found"
+                        )
+                );
+
+        // FIND EXPENSE
+        Expense expense = expenseRepository
+                .findById(expenseId)
+                .orElseThrow(() ->
+                        new ExpenseNotFoundException(
+                                "Expense not found"
+                        )
+                );
+
+        // OWNERSHIP VALIDATION
+        if (!expense.getUser()
+                .getId()
+                .equals(user.getId())) {
+
+            throw new InvalidArgumentException(
+                    "You are not authorized to update this expense"
+            );
+        }
+
+        // FIND CATEGORY
+        ExpenseCategory expenseCategory =
+                expenseCategoryRepository
+                        .findById(
+                                expenseRequest.getCategoryId()
+                        )
+                        .orElseThrow(() ->
+                                new CategoryNotFoundException(
+                                        "Category not found"
+                                )
+                        );
+
+        // UPDATE FIELDS
+        expense.setAmount(
+                expenseRequest.getAmount()
+        );
+
+        expense.setPaymentMode(
+                expenseRequest.getPaymentMode()
+        );
+
+        expense.setNote(
+                expenseRequest.getNote()
+        );
+
+        expense.setDate(
+                expenseRequest.getDate()
+        );
+
+        expense.setExpenseCategory(
+                expenseCategory
+        );
+
+        // SAVE UPDATED EXPENSE
+        Expense updatedExpense =
+                expenseRepository.save(expense);
+
+        return mapToResponse(updatedExpense);
+    }
+
     // UPDATE EXPENSE
     @Override
     public ExpenseResponse updateExpense(
@@ -280,6 +362,54 @@ public class ExpenseServiceImpl
                 expenseRepository.save(expense);
 
         return mapToResponse(updatedExpense);
+    }
+
+
+    @Override
+    public ExpenseResponse deleteExpense(
+            Integer expenseId
+    ) {
+
+        // GET CURRENT USER EMAIL
+        String email =
+                SecurityUtils.getCurrentUserEmail();
+
+        // FIND CURRENT USER
+        User user = userRepository
+                .findByEmail(email)
+                .orElseThrow(() ->
+                        new UserNotFoundException(
+                                "User not found"
+                        )
+                );
+
+        // FIND EXPENSE
+        Expense expense = expenseRepository
+                .findById(expenseId)
+                .orElseThrow(() ->
+                        new ExpenseNotFoundException(
+                                "Expense not found"
+                        )
+                );
+
+        // OWNERSHIP VALIDATION
+        if (!expense.getUser()
+                .getId()
+                .equals(user.getId())) {
+
+            throw new InvalidArgumentException(
+                    "You are not authorized to delete this expense"
+            );
+        }
+
+        // MAP RESPONSE BEFORE DELETE
+        ExpenseResponse response =
+                mapToResponse(expense);
+
+        // DELETE EXPENSE
+        expenseRepository.delete(expense);
+
+        return response;
     }
 
     // DELETE EXPENSE

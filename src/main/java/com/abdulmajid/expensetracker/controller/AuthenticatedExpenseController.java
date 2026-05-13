@@ -70,4 +70,39 @@ public class AuthenticatedExpenseController {
                         )
         );
     }
+
+    @PutMapping("/{expenseId}")
+    public ResponseEntity<ExpenseResponse>
+    updateExpense(
+
+            @PathVariable Integer expenseId,
+
+            @Valid
+            @RequestBody
+            ExpenseRequest expenseRequest
+    ) {
+
+        return ResponseEntity.ok(
+
+                expenseService.updateExpense(
+                        expenseId,
+                        expenseRequest
+                )
+        );
+    }
+
+    @DeleteMapping("/{expenseId}")
+    public ResponseEntity<ExpenseResponse>
+    deleteExpense(
+
+            @PathVariable Integer expenseId
+    ) {
+
+        return ResponseEntity.ok(
+
+                expenseService.deleteExpense(
+                        expenseId
+                )
+        );
+    }
 }

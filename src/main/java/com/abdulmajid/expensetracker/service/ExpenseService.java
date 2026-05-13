@@ -37,12 +37,21 @@ public interface ExpenseService {
     List<ExpenseResponse> getAllExpense();
 
     ExpenseResponse updateExpense(
+            Integer expenseId,
+            ExpenseRequest expenseRequest
+    );
+
+    ExpenseResponse updateExpense(
 
             Integer userId,
 
             Integer expenseId,
 
             ExpenseRequest expenseRequest
+    );
+    
+    ExpenseResponse deleteExpense(
+            Integer expenseId
     );
 
     void deleteExpense(
