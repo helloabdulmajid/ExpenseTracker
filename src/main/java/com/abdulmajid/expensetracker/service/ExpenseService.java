@@ -8,6 +8,12 @@ import java.util.List;
 
 public interface ExpenseService {
 
+    List<ExpenseResponse> getCurrentUserExpenses();
+
+    ExpenseResponse getCurrentUserExpense(
+            Integer expenseId
+    );
+
     ExpenseResponse createExpense(
             Integer userId,
             ExpenseRequest expenseRequest

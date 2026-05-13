@@ -4,6 +4,7 @@ import com.abdulmajid.expensetracker.dto.request.ExpenseRequest;
 import com.abdulmajid.expensetracker.dto.response.ExpenseResponse;
 import com.abdulmajid.expensetracker.exception.custom.CategoryNotFoundException;
 import com.abdulmajid.expensetracker.exception.custom.ExpenseNotFoundException;
+import com.abdulmajid.expensetracker.exception.custom.InvalidArgumentException;
 import com.abdulmajid.expensetracker.exception.custom.UserNotFoundException;
 import com.abdulmajid.expensetracker.model.Expense;
 import com.abdulmajid.expensetracker.model.ExpenseCategory;
@@ -11,6 +12,7 @@ import com.abdulmajid.expensetracker.model.User;
 import com.abdulmajid.expensetracker.repository.ExpenseCategoryRepository;
 import com.abdulmajid.expensetracker.repository.ExpenseRepository;
 import com.abdulmajid.expensetracker.repository.UserRepository;
+import com.abdulmajid.expensetracker.security.utils.SecurityUtils;
 import com.abdulmajid.expensetracker.service.ExpenseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -60,6 +62,68 @@ public class ExpenseServiceImpl
                 expenseRepository.save(expense);
 
         return mapToResponse(savedExpense);
+    }
+
+    //Ownership Validation
+    
+    @Override
+    public ExpenseResponse getCurrentUserExpense(
+            Integer expenseId
+    ) {
+
+        String email =
+                SecurityUtils.getCurrentUserEmail();
+
+        User user = userRepository
+                .findByEmail(email)
+                .orElseThrow(() ->
+                        new UserNotFoundException(
+                                "User not found"
+                        )
+                );
+
+        Expense expense = expenseRepository
+                .findById(expenseId)
+                .orElseThrow(() ->
+                        new ExpenseNotFoundException(
+                                "Expense not found"
+                        )
+                );
+
+        // OWNERSHIP VALIDATION
+        if (!expense.getUser()
+                .getId()
+                .equals(user.getId())) {
+
+            throw new InvalidArgumentException(
+                    "You are not authorized to access this expense"
+            );
+        }
+
+        return mapToResponse(expense);
+    }
+
+    //using jwt user for /me
+
+    @Override
+    public List<ExpenseResponse> getCurrentUserExpenses() {
+
+        String email =
+                SecurityUtils.getCurrentUserEmail();
+
+        User user = userRepository
+                .findByEmail(email)
+                .orElseThrow(() ->
+                        new UserNotFoundException(
+                                "User not found"
+                        )
+                );
+
+        return expenseRepository
+                .findByUserId(user.getId())
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     // GET USER EXPENSES

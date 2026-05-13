@@ -42,6 +42,35 @@ public class ExpenseController {
                 .body(response);
     }
 
+    // jwt authenticated user's single expense only.
+
+    @GetMapping("/me/{expenseId}")
+    public ResponseEntity<ExpenseResponse>
+    getCurrentUserExpense(
+
+            @PathVariable Integer expenseId
+    ) {
+
+        return ResponseEntity.ok(
+
+                expenseService
+                        .getCurrentUserExpense(
+                                expenseId
+                        )
+        );
+    }
+
+    // jwt user list of authenticated user's all expenses.
+
+    @GetMapping("/me")
+    public ResponseEntity<List<ExpenseResponse>>
+    getCurrentUserExpenses() {
+
+        return ResponseEntity.ok(
+                expenseService.getCurrentUserExpenses()
+        );
+    }
+
     // GET ALL EXPENSES FOR A USER
     @GetMapping
     public ResponseEntity<List<ExpenseResponse>> getUserExpenses(
