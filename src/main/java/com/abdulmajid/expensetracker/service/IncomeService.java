@@ -7,6 +7,26 @@ import java.util.List;
 
 public interface IncomeService {
 
+
+    IncomeResponse createIncome(
+            IncomeRequest incomeRequest
+    );
+
+    List<IncomeResponse> getCurrentUserIncomes();
+
+    IncomeResponse getCurrentUserIncome(
+            Integer incomeId
+    );
+
+    IncomeResponse updateIncome(
+            Integer incomeId,
+            IncomeRequest incomeRequest
+    );
+
+    IncomeResponse deleteIncome(
+            Integer incomeId
+    );
+
     IncomeResponse createIncomeForUser(
             Integer userId,
             IncomeRequest incomeRequest
