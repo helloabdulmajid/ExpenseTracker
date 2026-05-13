@@ -2,6 +2,7 @@ package com.abdulmajid.expensetracker.service.impl;
 
 import com.abdulmajid.expensetracker.dto.request.ExpenseRequest;
 import com.abdulmajid.expensetracker.dto.response.ExpenseResponse;
+import com.abdulmajid.expensetracker.enums.PaymentMode;
 import com.abdulmajid.expensetracker.exception.custom.CategoryNotFoundException;
 import com.abdulmajid.expensetracker.exception.custom.ExpenseNotFoundException;
 import com.abdulmajid.expensetracker.exception.custom.InvalidArgumentException;
@@ -649,6 +650,8 @@ public class ExpenseServiceImpl
         return response;
     }
 
+    // pagination, sorting
+
     @Override
     public Page<ExpenseResponse>
     getCurrentUserExpenses(
@@ -659,7 +662,11 @@ public class ExpenseServiceImpl
 
             String sortBy,
 
-            String sortDir
+            String sortDir,
+
+            PaymentMode paymentMode,
+
+            String keyword
     ) {
 
         // GET CURRENT USER EMAIL
@@ -675,7 +682,7 @@ public class ExpenseServiceImpl
                         )
                 );
 
-        // SORT DIRECTION
+        // SORT
         Sort sort = sortDir.equalsIgnoreCase("asc")
 
                 ? Sort.by(sortBy).ascending()
@@ -690,16 +697,74 @@ public class ExpenseServiceImpl
                         sort
                 );
 
-        // FETCH DATA
-        Page<Expense> expensePage =
-                expenseRepository.findByUserId(
-                        user.getId(),
-                        pageable
-                );
+        // DEFAULT KEYWORD
+        if (keyword == null) {
 
-        // MAP RESPONSE
+            keyword = "";
+        }
+
+        // FETCH FILTERED DATA
+        Page<Expense> expensePage;
+
+        if (paymentMode != null
+                && keyword != null
+                && !keyword.isBlank()) {
+
+            // PAYMENT MODE + KEYWORD
+            expensePage = expenseRepository
+                    .findByUserIdAndPaymentModeAndNoteContainingIgnoreCase(
+
+                            user.getId(),
+
+                            paymentMode,
+
+                            keyword,
+
+                            pageable
+                    );
+
+        } else if (paymentMode != null) {
+
+            // ONLY PAYMENT MODE
+            expensePage = expenseRepository
+                    .findByUserIdAndPaymentMode(
+
+                            user.getId(),
+
+                            paymentMode,
+
+                            pageable
+                    );
+
+        } else if (keyword != null
+                && !keyword.isBlank()) {
+
+            // ONLY KEYWORD
+            expensePage = expenseRepository
+                    .findByUserIdAndNoteContainingIgnoreCase(
+
+                            user.getId(),
+
+                            keyword,
+
+                            pageable
+                    );
+
+        } else {
+
+            // NO FILTER
+            expensePage = expenseRepository
+                    .findByUserId(
+
+                            user.getId(),
+
+                            pageable
+                    );
+        }
+
         return expensePage.map(
                 this::mapToResponse
         );
     }
+
 }

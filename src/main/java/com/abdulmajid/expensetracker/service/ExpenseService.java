@@ -2,6 +2,7 @@ package com.abdulmajid.expensetracker.service;
 
 import com.abdulmajid.expensetracker.dto.request.ExpenseRequest;
 import com.abdulmajid.expensetracker.dto.response.ExpenseResponse;
+import com.abdulmajid.expensetracker.enums.PaymentMode;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDate;
@@ -91,6 +92,10 @@ public interface ExpenseService {
 
             String sortBy,
 
-            String sortDir
+            String sortDir,
+
+            PaymentMode paymentMode,
+
+            String keyword
     );
 }

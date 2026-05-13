@@ -2,6 +2,7 @@ package com.abdulmajid.expensetracker.controller;
 
 import com.abdulmajid.expensetracker.dto.request.ExpenseRequest;
 import com.abdulmajid.expensetracker.dto.response.ExpenseResponse;
+import com.abdulmajid.expensetracker.enums.PaymentMode;
 import com.abdulmajid.expensetracker.service.ExpenseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -64,19 +65,36 @@ public class AuthenticatedExpenseController {
             @RequestParam(
                     defaultValue = "desc"
             )
-            String sortDir
+            String sortDir,
+
+            @RequestParam(required = false)
+            PaymentMode paymentMode,
+
+            @RequestParam(
+                    required = false
+            )
+            String keyword
     ) {
 
         return ResponseEntity.ok(
 
                 expenseService
                         .getCurrentUserExpenses(
+
                                 page,
+
                                 size,
+
                                 sortBy,
-                                sortDir
+
+                                sortDir,
+
+                                paymentMode,
+
+                                keyword
                         )
         );
+
     }
 
     // GET SINGLE CURRENT USER EXPENSE

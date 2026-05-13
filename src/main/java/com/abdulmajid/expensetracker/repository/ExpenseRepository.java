@@ -1,5 +1,6 @@
 package com.abdulmajid.expensetracker.repository;
 
+import com.abdulmajid.expensetracker.enums.PaymentMode;
 import com.abdulmajid.expensetracker.model.Expense;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,5 +43,37 @@ public interface ExpenseRepository
             Integer userId,
 
             LocalDate day
+    );
+
+    Page<Expense>
+    findByUserIdAndNoteContainingIgnoreCase(
+
+            Integer userId,
+
+            String keyword,
+
+            Pageable pageable
+    );
+
+    Page<Expense>
+    findByUserIdAndPaymentMode(
+
+            Integer userId,
+
+            PaymentMode paymentMode,
+
+            Pageable pageable
+    );
+
+    Page<Expense>
+    findByUserIdAndPaymentModeAndNoteContainingIgnoreCase(
+
+            Integer userId,
+
+            PaymentMode paymentMode,
+
+            String keyword,
+
+            Pageable pageable
     );
 }
