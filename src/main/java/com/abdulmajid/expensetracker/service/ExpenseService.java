@@ -2,6 +2,7 @@ package com.abdulmajid.expensetracker.service;
 
 import com.abdulmajid.expensetracker.dto.request.ExpenseRequest;
 import com.abdulmajid.expensetracker.dto.response.ExpenseResponse;
+import org.springframework.data.domain.Page;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -49,7 +50,7 @@ public interface ExpenseService {
 
             ExpenseRequest expenseRequest
     );
-    
+
     ExpenseResponse deleteExpense(
             Integer expenseId
     );
@@ -80,5 +81,16 @@ public interface ExpenseService {
             Integer userId,
 
             LocalDate day
+    );
+
+    Page<ExpenseResponse> getCurrentUserExpenses(
+
+            int page,
+
+            int size,
+
+            String sortBy,
+
+            String sortDir
     );
 }

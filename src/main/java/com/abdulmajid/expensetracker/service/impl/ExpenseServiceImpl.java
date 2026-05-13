@@ -15,6 +15,10 @@ import com.abdulmajid.expensetracker.repository.UserRepository;
 import com.abdulmajid.expensetracker.security.utils.SecurityUtils;
 import com.abdulmajid.expensetracker.service.ExpenseService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
@@ -643,5 +647,59 @@ public class ExpenseServiceImpl
         );
 
         return response;
+    }
+
+    @Override
+    public Page<ExpenseResponse>
+    getCurrentUserExpenses(
+
+            int page,
+
+            int size,
+
+            String sortBy,
+
+            String sortDir
+    ) {
+
+        // GET CURRENT USER EMAIL
+        String email =
+                SecurityUtils.getCurrentUserEmail();
+
+        // FIND USER
+        User user = userRepository
+                .findByEmail(email)
+                .orElseThrow(() ->
+                        new UserNotFoundException(
+                                "User not found"
+                        )
+                );
+
+        // SORT DIRECTION
+        Sort sort = sortDir.equalsIgnoreCase("asc")
+
+                ? Sort.by(sortBy).ascending()
+
+                : Sort.by(sortBy).descending();
+
+        // PAGEABLE
+        Pageable pageable =
+                PageRequest.of(
+                        page,
+                        size,
+                        sort
+                );
+
+        // FETCH DATA
+        Page<Expense> expensePage =
+                expenseRepository.findByUserId(
+                        user.getId(),
+                        pageable
+                );
+
+        // MAP RESPONSE
+        return expensePage.map(
+                this::mapToResponse
+        );
     }
 }

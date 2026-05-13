@@ -1,6 +1,8 @@
 package com.abdulmajid.expensetracker.repository;
 
 import com.abdulmajid.expensetracker.model.Expense;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
@@ -12,6 +14,11 @@ public interface ExpenseRepository
 
     List<Expense> findByUserId(
             Integer userId
+    );
+
+    Page<Expense> findByUserId(
+            Integer userId,
+            Pageable pageable
     );
 
     Optional<Expense> findByIdAndUserId(
