@@ -43,6 +43,14 @@ public class UserController {
                 .body(response);
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<UserResponse> getCurrentUser() {
+
+        return ResponseEntity.ok(
+                userService.getCurrentUser()
+        );
+    }
+
     // GET SINGLE USER
     @GetMapping("/{userId}")
     public ResponseEntity<UserResponse> getOneUser(

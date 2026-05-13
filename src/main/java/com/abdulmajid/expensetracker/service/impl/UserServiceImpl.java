@@ -6,6 +6,7 @@ import com.abdulmajid.expensetracker.exception.custom.InvalidArgumentException;
 import com.abdulmajid.expensetracker.exception.custom.UserNotFoundException;
 import com.abdulmajid.expensetracker.model.User;
 import com.abdulmajid.expensetracker.repository.UserRepository;
+import com.abdulmajid.expensetracker.security.utils.SecurityUtils;
 import com.abdulmajid.expensetracker.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -143,6 +144,23 @@ public class UserServiceImpl implements UserService {
                     "Phone already in use"
             );
         }
+    }
+
+    @Override
+    public UserResponse getCurrentUser() {
+
+        String email =
+                SecurityUtils.getCurrentUserEmail();
+
+        User user = userRepository
+                .findByEmail(email)
+                .orElseThrow(() ->
+                        new UserNotFoundException(
+                                "User not found"
+                        )
+                );
+
+        return mapToResponse(user);
     }
 
     // MAPPER METHOD
