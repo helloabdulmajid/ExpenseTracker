@@ -1,5 +1,6 @@
 package com.abdulmajid.expensetracker.dto.response;
 
+import com.abdulmajid.expensetracker.enums.PaymentMode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,7 +19,7 @@ public class ExpenseResponse {
 
     private BigDecimal amount;
 
-    private String paymentMode;
+    private PaymentMode paymentMode;
 
     private String note;
 

@@ -15,6 +15,10 @@ public interface ExpenseService {
     );
 
     ExpenseResponse createExpense(
+            ExpenseRequest expenseRequest
+    );
+
+    ExpenseResponse createExpense(
             Integer userId,
             ExpenseRequest expenseRequest
     );

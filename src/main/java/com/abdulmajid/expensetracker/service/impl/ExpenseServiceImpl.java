@@ -64,8 +64,73 @@ public class ExpenseServiceImpl
         return mapToResponse(savedExpense);
     }
 
+    @Override
+    public ExpenseResponse createExpense(
+            ExpenseRequest expenseRequest
+    ) {
+
+        // GET CURRENT LOGGED-IN USER EMAIL
+        String email =
+                SecurityUtils.getCurrentUserEmail();
+
+        // FIND USER
+        User user = userRepository
+                .findByEmail(email)
+                .orElseThrow(() ->
+                        new UserNotFoundException(
+                                "User not found"
+                        )
+                );
+
+        // FIND CATEGORY
+        ExpenseCategory expenseCategory =
+                expenseCategoryRepository
+                        .findById(
+                                expenseRequest.getCategoryId()
+                        )
+                        .orElseThrow(() ->
+                                new CategoryNotFoundException(
+                                        "Category not found"
+                                )
+                        );
+
+        // CREATE EXPENSE
+        Expense expense = new Expense();
+
+        expense.setAmount(
+                expenseRequest.getAmount()
+        );
+
+        expense.setPaymentMode(
+                expenseRequest.getPaymentMode()
+
+        );
+
+        expense.setNote(
+                expenseRequest.getNote()
+        );
+
+        expense.setDate(
+                expenseRequest.getDate()
+        );
+
+        expense.setExpenseCategory(
+                expenseCategory
+        );
+
+        // jwt auth user
+        expense.setUser(user);
+
+        // SAVE
+        Expense savedExpense =
+                expenseRepository.save(expense);
+
+        return mapToResponse(savedExpense);
+    }
+
+
     //Ownership Validation
-    
+
     @Override
     public ExpenseResponse getCurrentUserExpense(
             Integer expenseId
@@ -102,6 +167,7 @@ public class ExpenseServiceImpl
 
         return mapToResponse(expense);
     }
+
 
     //using jwt user for /me
 

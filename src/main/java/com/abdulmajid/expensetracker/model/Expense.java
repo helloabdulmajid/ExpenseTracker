@@ -1,8 +1,8 @@
 package com.abdulmajid.expensetracker.model;
 
+import com.abdulmajid.expensetracker.enums.PaymentMode;
 import com.abdulmajid.expensetracker.model.base.BaseEntity;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,9 +28,10 @@ public class Expense extends BaseEntity {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
 
-    @NotBlank(message = "Payment mode is required")
+    @NotNull(message = "Payment mode is required")
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String paymentMode;
+    private PaymentMode paymentMode;
 
     private String note;
 
@@ -48,7 +49,7 @@ public class Expense extends BaseEntity {
 
     public Expense(
             BigDecimal amount,
-            String paymentMode,
+            PaymentMode paymentMode,
             String note,
             LocalDate date,
             ExpenseCategory expenseCategory,

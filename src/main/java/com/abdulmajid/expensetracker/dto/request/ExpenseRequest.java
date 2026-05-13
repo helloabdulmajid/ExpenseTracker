@@ -1,5 +1,6 @@
 package com.abdulmajid.expensetracker.dto.request;
 
+import com.abdulmajid.expensetracker.enums.PaymentMode;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,12 +20,8 @@ public class ExpenseRequest {
     @DecimalMax(value = "1000000.0", message = "Expense amount should be lower than 1M")
     private BigDecimal amount;
 
-    @NotBlank(message = "Please choose a payment mode")
-    @Pattern(
-            regexp = "CASH|CARD|UPI",
-            message = "Invalid payment mode. Choose CASH, CARD, or UPI"
-    )
-    private String paymentMode;
+    @NotNull(message = "Payment mode is required")
+    private PaymentMode paymentMode;
 
     private String note;
 
