@@ -1,6 +1,7 @@
 package com.abdulmajid.expensetracker.service.impl;
 
 import com.abdulmajid.expensetracker.dto.request.ExpenseRequest;
+import com.abdulmajid.expensetracker.dto.response.DashboardSummaryResponse;
 import com.abdulmajid.expensetracker.dto.response.ExpenseResponse;
 import com.abdulmajid.expensetracker.enums.PaymentMode;
 import com.abdulmajid.expensetracker.exception.custom.CategoryNotFoundException;
@@ -12,6 +13,7 @@ import com.abdulmajid.expensetracker.model.ExpenseCategory;
 import com.abdulmajid.expensetracker.model.User;
 import com.abdulmajid.expensetracker.repository.ExpenseCategoryRepository;
 import com.abdulmajid.expensetracker.repository.ExpenseRepository;
+import com.abdulmajid.expensetracker.repository.IncomeRepository;
 import com.abdulmajid.expensetracker.repository.UserRepository;
 import com.abdulmajid.expensetracker.security.utils.SecurityUtils;
 import com.abdulmajid.expensetracker.service.ExpenseService;
@@ -22,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
@@ -36,37 +39,19 @@ public class ExpenseServiceImpl
 
     private final ExpenseCategoryRepository expenseCategoryRepository;
 
+    private final IncomeRepository incomeRepository;
+
     private final UserRepository userRepository;
 
-    // CREATE EXPENSE
     @Override
-    public ExpenseResponse createExpense(
-
-            Integer userId,
-
-            ExpenseRequest expenseRequest
-    ) {
-
-        User user = getUserById(userId);
-
-        ExpenseCategory expenseCategory =
-                getExpenseCategoryById(
-                        expenseRequest.getCategoryId()
-                );
-
-        Expense expense = new Expense(
-                expenseRequest.getAmount(),
-                expenseRequest.getPaymentMode(),
-                expenseRequest.getNote(),
-                expenseRequest.getDate(),
-                expenseCategory,
-                user
-        );
-
-        Expense savedExpense =
-                expenseRepository.save(expense);
-
-        return mapToResponse(savedExpense);
+    public List<ExpenseResponse> getCurrentUserExpenses() {
+        String email = SecurityUtils.getCurrentUserEmail();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        return expenseRepository.findByUserId(user.getId())
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     @Override
@@ -174,71 +159,6 @@ public class ExpenseServiceImpl
     }
 
 
-    //using jwt user for /me
-
-    @Override
-    public List<ExpenseResponse> getCurrentUserExpenses() {
-
-        String email =
-                SecurityUtils.getCurrentUserEmail();
-
-        User user = userRepository
-                .findByEmail(email)
-                .orElseThrow(() ->
-                        new UserNotFoundException(
-                                "User not found"
-                        )
-                );
-
-        return expenseRepository
-                .findByUserId(user.getId())
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
-    }
-
-    // GET USER EXPENSES
-    @Override
-    public List<ExpenseResponse> getExpenseForUser(
-            Integer userId
-    ) {
-
-        getUserById(userId);
-
-        return expenseRepository.findByUserId(userId)
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
-    }
-
-    // GET SINGLE EXPENSE
-    @Override
-    public ExpenseResponse getExpense(
-
-            Integer userId,
-
-            Integer expenseId
-    ) {
-
-        Expense expense =
-                getExpenseByIdAndUserId(
-                        expenseId,
-                        userId
-                );
-
-        return mapToResponse(expense);
-    }
-
-    // GET ALL EXPENSES
-    @Override
-    public List<ExpenseResponse> getAllExpense() {
-
-        return expenseRepository.findAll()
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
-    }
-
     //new update without user id
 
     @Override
@@ -321,55 +241,6 @@ public class ExpenseServiceImpl
         return mapToResponse(updatedExpense);
     }
 
-    // UPDATE EXPENSE
-    @Override
-    public ExpenseResponse updateExpense(
-
-            Integer userId,
-
-            Integer expenseId,
-
-            ExpenseRequest expenseRequest
-    ) {
-
-        Expense expense =
-                getExpenseByIdAndUserId(
-                        expenseId,
-                        userId
-                );
-
-        ExpenseCategory expenseCategory =
-                getExpenseCategoryById(
-                        expenseRequest.getCategoryId()
-                );
-
-        expense.setAmount(
-                expenseRequest.getAmount()
-        );
-
-        expense.setPaymentMode(
-                expenseRequest.getPaymentMode()
-        );
-
-        expense.setNote(
-                expenseRequest.getNote()
-        );
-
-        expense.setDate(
-                expenseRequest.getDate()
-        );
-
-        expense.setExpenseCategory(
-                expenseCategory
-        );
-
-        Expense updatedExpense =
-                expenseRepository.save(expense);
-
-        return mapToResponse(updatedExpense);
-    }
-
-
     @Override
     public ExpenseResponse deleteExpense(
             Integer expenseId
@@ -417,154 +288,6 @@ public class ExpenseServiceImpl
         return response;
     }
 
-    // DELETE EXPENSE
-    @Override
-    public void deleteExpense(
-
-            Integer userId,
-
-            Integer expenseId
-    ) {
-
-        Expense expense =
-                getExpenseByIdAndUserId(
-                        expenseId,
-                        userId
-                );
-
-        expenseRepository.delete(expense);
-    }
-
-    // MONTHLY EXPENSES
-    @Override
-    public List<ExpenseResponse> getMonthlyExpenses(
-
-            Integer userId,
-
-            Integer month
-    ) {
-
-        getUserById(userId);
-
-        LocalDate firstDay =
-                LocalDate.of(
-                        LocalDate.now().getYear(),
-                        month,
-                        1
-                );
-
-        LocalDate lastDay =
-                firstDay.withDayOfMonth(
-                        firstDay.lengthOfMonth()
-                );
-
-        List<Expense> expenses =
-                expenseRepository.findByUserIdAndDateBetween(
-                        userId,
-                        firstDay,
-                        lastDay
-                );
-
-        if (expenses.isEmpty()) {
-
-            throw new ExpenseNotFoundException(
-                    "No expenses found for this month"
-            );
-        }
-
-        return expenses.stream()
-                .map(this::mapToResponse)
-                .toList();
-    }
-
-    // WEEKLY EXPENSES
-    @Override
-    public List<ExpenseResponse> getWeeklyExpenses(
-
-            Integer userId,
-
-            Integer week
-    ) {
-
-        getUserById(userId);
-
-        LocalDate firstDayOfYear =
-                LocalDate.of(
-                        LocalDate.now().getYear(),
-                        1,
-                        1
-                );
-
-        LocalDate startOfWeek =
-                firstDayOfYear
-                        .plusWeeks(week - 1)
-                        .with(DayOfWeek.MONDAY);
-
-        LocalDate endOfWeek =
-                startOfWeek.plusDays(6);
-
-        List<Expense> expenses =
-                expenseRepository.findByUserIdAndDateBetween(
-                        userId,
-                        startOfWeek,
-                        endOfWeek
-                );
-
-        if (expenses.isEmpty()) {
-
-            throw new ExpenseNotFoundException(
-                    "No expenses found for this week"
-            );
-        }
-
-        return expenses.stream()
-                .map(this::mapToResponse)
-                .toList();
-    }
-
-    // DAILY EXPENSES
-    @Override
-    public List<ExpenseResponse> getDailyExpenses(
-
-            Integer userId,
-
-            LocalDate day
-    ) {
-
-        getUserById(userId);
-
-        List<Expense> expenses =
-                expenseRepository.findByUserIdAndDate(
-                        userId,
-                        day
-                );
-
-        if (expenses.isEmpty()) {
-
-            throw new ExpenseNotFoundException(
-                    "No expenses found for this day"
-            );
-        }
-
-        return expenses.stream()
-                .map(this::mapToResponse)
-                .toList();
-    }
-
-    // HELPER METHOD
-    private User getUserById(
-            Integer userId
-    ) {
-
-        return userRepository.findById(userId)
-                .orElseThrow(() ->
-                        new UserNotFoundException(
-                                "User not found with ID: "
-                                        + userId
-                        )
-                );
-    }
-
     // HELPER METHOD
     private ExpenseCategory getExpenseCategoryById(
             Integer categoryId
@@ -575,26 +298,6 @@ public class ExpenseServiceImpl
                         new CategoryNotFoundException(
                                 "Expense category not found with ID: "
                                         + categoryId
-                        )
-                );
-    }
-
-    // HELPER METHOD
-    private Expense getExpenseByIdAndUserId(
-
-            Integer expenseId,
-
-            Integer userId
-    ) {
-
-        return expenseRepository.findByIdAndUserId(
-                        expenseId,
-                        userId
-                )
-                .orElseThrow(() ->
-                        new ExpenseNotFoundException(
-                                "Expense not found with ID: "
-                                        + expenseId
                         )
                 );
     }
@@ -648,6 +351,50 @@ public class ExpenseServiceImpl
         );
 
         return response;
+    }
+
+    @Override
+    public DashboardSummaryResponse
+    getDashboardSummary() {
+
+        String email =
+                SecurityUtils
+                        .getCurrentUserEmail();
+
+        User user =
+                userRepository
+                        .findByEmail(email)
+                        .orElseThrow(
+                                () -> new UserNotFoundException(
+                                        "User not found"
+                                )
+                        );
+
+        BigDecimal totalExpenses =
+                expenseRepository
+                        .getTotalExpensesByUserId(
+                                user.getId()
+                        );
+
+        BigDecimal totalIncome =
+                incomeRepository
+                        .getTotalIncomeByUserId(
+                                user.getId()
+                        );
+
+        BigDecimal balance =
+                totalIncome.subtract(
+                        totalExpenses
+                );
+
+        return new DashboardSummaryResponse(
+
+                totalExpenses,
+
+                totalIncome,
+
+                balance
+        );
     }
 
     // pagination, sorting

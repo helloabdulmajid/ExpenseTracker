@@ -19,7 +19,7 @@ public class SecurityUtils {
         if (authentication == null
                 || authentication.getName() == null) {
 
-            return null;
+            throw new com.abdulmajid.expensetracker.exception.custom.UserNotFoundException("User not authenticated");
         }
 
         return authentication.getName();

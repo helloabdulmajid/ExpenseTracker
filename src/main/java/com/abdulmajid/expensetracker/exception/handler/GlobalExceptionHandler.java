@@ -1,8 +1,11 @@
 package com.abdulmajid.expensetracker.exception.handler;
 
 import com.abdulmajid.expensetracker.exception.custom.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,12 +16,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
+@Slf4j
 
 public class GlobalExceptionHandler {
 
     // VALIDATION ERRORS
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>>
+    public ResponseEntity<ApiErrorResponse>
     handleValidationExceptions(
             MethodArgumentNotValidException ex
     ) {
@@ -35,9 +39,10 @@ public class GlobalExceptionHandler {
             );
         }
 
-        return ResponseEntity
-                .badRequest()
-                .body(errors);
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                "Validation failed: " + errors
+        );
     }
 
     // USER NOT FOUND
@@ -144,6 +149,32 @@ public class GlobalExceptionHandler {
         );
     }
 
+    // DATA INTEGRITY VIOLATION
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiErrorResponse>
+    handleDataIntegrityViolation(
+            DataIntegrityViolationException ex
+    ) {
+
+        return buildErrorResponse(
+                HttpStatus.CONFLICT,
+                "Data integrity violation: " + ex.getMostSpecificCause().getMessage()
+        );
+    }
+
+    // ACCESS DENIED
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiErrorResponse>
+    handleAccessDenied(
+            AccessDeniedException ex
+    ) {
+
+        return buildErrorResponse(
+                HttpStatus.FORBIDDEN,
+                "Access denied: " + ex.getMessage()
+        );
+    }
+
     // GLOBAL ERROR
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse>
@@ -151,7 +182,7 @@ public class GlobalExceptionHandler {
             Exception ex
     ) {
 
-        ex.printStackTrace();
+        log.error("Unexpected error", ex);
 
         return buildErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR,

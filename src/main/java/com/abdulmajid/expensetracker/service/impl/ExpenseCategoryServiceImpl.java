@@ -3,14 +3,15 @@ package com.abdulmajid.expensetracker.service.impl;
 import com.abdulmajid.expensetracker.dto.request.ExpenseCategoryRequest;
 import com.abdulmajid.expensetracker.dto.response.ExpenseCategoryResponse;
 import com.abdulmajid.expensetracker.exception.custom.CategoryNotFoundException;
+import com.abdulmajid.expensetracker.exception.custom.InvalidArgumentException;
 import com.abdulmajid.expensetracker.exception.custom.UserNotFoundException;
 import com.abdulmajid.expensetracker.model.ExpenseCategory;
 import com.abdulmajid.expensetracker.model.User;
 import com.abdulmajid.expensetracker.repository.ExpenseCategoryRepository;
 import com.abdulmajid.expensetracker.repository.UserRepository;
+import com.abdulmajid.expensetracker.security.utils.SecurityUtils;
 import com.abdulmajid.expensetracker.service.ExpenseCategoryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,15 +26,11 @@ public class ExpenseCategoryServiceImpl
 
     private final ExpenseCategoryRepository expenseCategoryRepository;
 
-    // =========================================
-    // AUTHENTICATED CATEGORY APIs
-    // =========================================
-
     @Override
     public List<ExpenseCategoryResponse>
-    getMyCategories(Authentication authentication) {
+    getMyCategories() {
 
-        User user = getAuthenticatedUser(authentication);
+        User user = getCurrentUser();
 
         List<ExpenseCategory> categories =
                 expenseCategoryRepository
@@ -49,13 +46,10 @@ public class ExpenseCategoryServiceImpl
     @Override
     public ExpenseCategoryResponse
     createMyCategory(
-
-            Authentication authentication,
-
             ExpenseCategoryRequest request
     ) {
 
-        User user = getAuthenticatedUser(authentication);
+        User user = getCurrentUser();
 
         validateCategory(
                 request.getCategoryName(),
@@ -85,28 +79,24 @@ public class ExpenseCategoryServiceImpl
     @Override
     public ExpenseCategoryResponse
     updateMyCategory(
-
-            Authentication authentication,
-
             Integer categoryId,
-
             ExpenseCategoryRequest request
     ) {
 
-        User user = getAuthenticatedUser(authentication);
+        User user = getCurrentUser();
 
         ExpenseCategory category =
                 expenseCategoryRepository
                         .findById(categoryId)
                         .orElseThrow(() ->
-                                new RuntimeException(
+                                new CategoryNotFoundException(
                                         "Category not found"
                                 )
                         );
 
         if (category.isDefaultCategory()) {
 
-            throw new RuntimeException(
+            throw new InvalidArgumentException(
                     "Default categories cannot be updated"
             );
         }
@@ -119,7 +109,7 @@ public class ExpenseCategoryServiceImpl
                                 .equals(user.getId())
         ) {
 
-            throw new RuntimeException(
+            throw new InvalidArgumentException(
                     "Unauthorized category access"
             );
         }
@@ -139,26 +129,23 @@ public class ExpenseCategoryServiceImpl
 
     @Override
     public void deleteMyCategory(
-
-            Authentication authentication,
-
             Integer categoryId
     ) {
 
-        User user = getAuthenticatedUser(authentication);
+        User user = getCurrentUser();
 
         ExpenseCategory category =
                 expenseCategoryRepository
                         .findById(categoryId)
                         .orElseThrow(() ->
-                                new RuntimeException(
+                                new CategoryNotFoundException(
                                         "Category not found"
                                 )
                         );
 
         if (category.isDefaultCategory()) {
 
-            throw new RuntimeException(
+            throw new InvalidArgumentException(
                     "Default categories cannot be deleted"
             );
         }
@@ -171,70 +158,13 @@ public class ExpenseCategoryServiceImpl
                                 .equals(user.getId())
         ) {
 
-            throw new RuntimeException(
+            throw new InvalidArgumentException(
                     "Unauthorized category access"
             );
         }
 
         expenseCategoryRepository
                 .delete(category);
-    }
-
-    // =========================================
-    // OLD APIs
-    // =========================================
-
-    @Override
-    public List<ExpenseCategoryResponse>
-    getCategoriesForUser(
-            Integer userId
-    ) {
-
-        getUserById(userId);
-
-        return expenseCategoryRepository
-                .findByUserId(userId)
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
-    }
-
-    @Override
-    public ExpenseCategoryResponse
-    createCategoryForUser(
-
-            Integer userId,
-
-            ExpenseCategoryRequest expenseCategoryRequest
-    ) {
-
-        User user = getUserById(userId);
-
-        validateCategory(
-                expenseCategoryRequest
-                        .getCategoryName(),
-                user
-        );
-
-        ExpenseCategory expenseCategory =
-                new ExpenseCategory();
-
-        expenseCategory.setCategoryName(
-                expenseCategoryRequest
-                        .getCategoryName()
-                        .trim()
-                        .toUpperCase()
-        );
-
-        expenseCategory.setDefaultCategory(false);
-
-        expenseCategory.setUser(user);
-
-        ExpenseCategory savedCategory =
-                expenseCategoryRepository
-                        .save(expenseCategory);
-
-        return mapToResponse(savedCategory);
     }
 
     @Override
@@ -263,31 +193,15 @@ public class ExpenseCategoryServiceImpl
     // HELPER METHODS
     // =========================================
 
-    private User getAuthenticatedUser(
-            Authentication authentication
-    ) {
+    private User getCurrentUser() {
 
-        String email = authentication.getName();
+        String email = SecurityUtils.getCurrentUserEmail();
 
         return userRepository
                 .findByEmail(email)
                 .orElseThrow(() ->
-                        new RuntimeException(
-                                "User not found"
-                        )
-                );
-    }
-
-    private User getUserById(
-            Integer userId
-    ) {
-
-        return userRepository
-                .findById(userId)
-                .orElseThrow(() ->
                         new UserNotFoundException(
-                                "User not found with ID: "
-                                        + userId
+                                "User not found"
                         )
                 );
     }

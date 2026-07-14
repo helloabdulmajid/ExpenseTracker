@@ -1,35 +1,16 @@
 package com.abdulmajid.expensetracker.dto.request;
-
+import com.abdulmajid.expensetracker.enums.ReceiveMode;
 import jakarta.validation.constraints.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
+import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Getter
-@Setter
-@NoArgsConstructor
-
+@Getter @Setter @NoArgsConstructor
 public class IncomeRequest {
-
-    @NotNull(message = "Amount cannot be null")
-    @DecimalMin(value = "0.01", message = "Amount must be greater than 0")
-    private BigDecimal amount;
-
-    @NotBlank(message = "Receive mode is required")
-    private String receiveMode;
-
+    @NotNull @DecimalMin("0.01") private BigDecimal amount;
+    @NotNull private ReceiveMode receiveMode;
     private String note;
-
-    @PastOrPresent(message = "Date cannot be in the future")
-    @NotNull(message = "Date cannot be null")
-    private LocalDate date;
-
-    @NotNull(message = "Category ID is required")
-    @Min(value = 1, message = "Category ID must be a positive number")
-    private Integer categoryId;
-
+    @PastOrPresent @NotNull private LocalDate date;
+    @NotNull @Min(1) private Integer categoryId;
     private Integer userId;
 }

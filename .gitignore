@@ -36,3 +36,9 @@ build/
 
 ### Extra Folder ###
 api-collection
+# Local config
+application-local.properties
+application-local.yml
+.env
+.env.local
+.env.*.local

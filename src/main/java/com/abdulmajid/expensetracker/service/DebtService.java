@@ -7,8 +7,6 @@ import java.util.List;
 
 public interface DebtService {
 
-    //new authcontroller
-
     DebtResponse createDebt(
             DebtRequest debtRequest
     );
@@ -25,33 +23,6 @@ public interface DebtService {
     );
 
     DebtResponse deleteDebt(
-            Integer debtId
-    );
-
-    //controller old
-
-    DebtResponse createDebtForUser(
-            Integer userId,
-            DebtRequest debtRequest
-    );
-
-    List<DebtResponse> getAllDebtForUser(
-            Integer userId
-    );
-
-    DebtResponse getDebt(
-            Integer userId,
-            Integer debtId
-    );
-
-    DebtResponse updateDebt(
-            Integer userId,
-            Integer debtId,
-            DebtRequest debtRequest
-    );
-
-    void deleteDebt(
-            Integer userId,
             Integer debtId
     );
 }

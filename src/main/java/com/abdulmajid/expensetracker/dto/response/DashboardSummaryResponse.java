@@ -5,18 +5,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class ExpenseCategoryResponse {
+public class DashboardSummaryResponse {
 
-    private Integer id;
+    private BigDecimal totalExpenses;
 
-    private String categoryName;
+    private BigDecimal totalIncome;
 
-    private boolean defaultCategory;
-
-    private Integer userId;
+    private BigDecimal balance;
 }

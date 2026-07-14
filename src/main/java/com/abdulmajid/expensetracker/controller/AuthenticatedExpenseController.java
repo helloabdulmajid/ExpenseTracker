@@ -1,6 +1,7 @@
 package com.abdulmajid.expensetracker.controller;
 
 import com.abdulmajid.expensetracker.dto.request.ExpenseRequest;
+import com.abdulmajid.expensetracker.dto.response.DashboardSummaryResponse;
 import com.abdulmajid.expensetracker.dto.response.ExpenseResponse;
 import com.abdulmajid.expensetracker.enums.PaymentMode;
 import com.abdulmajid.expensetracker.service.ExpenseService;
@@ -58,7 +59,7 @@ public class AuthenticatedExpenseController {
             int size,
 
             @RequestParam(
-                    defaultValue = "date"
+                    defaultValue = "createdAt"
             )
             String sortBy,
 
@@ -111,6 +112,18 @@ public class AuthenticatedExpenseController {
                         .getCurrentUserExpense(
                                 expenseId
                         )
+        );
+    }
+
+    @GetMapping("/dashboard-summary")
+    public ResponseEntity<
+            DashboardSummaryResponse
+            > getDashboardSummary() {
+
+        return ResponseEntity.ok(
+
+                expenseService
+                        .getDashboardSummary()
         );
     }
 

@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -13,13 +14,11 @@ import java.util.Date;
 
 public class JwtService {
 
-    // SECRET KEY
-    private static final String SECRET_KEY =
-            "mySuperSecretKeyForJwtAuthentication123456";
+    @Value("${jwt.secret}")
+    private String SECRET_KEY;
 
-    // TOKEN EXPIRATION (24 HOURS)
-    private static final long EXPIRATION_TIME =
-            1000 * 60 * 60 * 24;
+    @Value("${jwt.expiration:86400000}")
+    private long EXPIRATION_TIME;
 
     // GENERATE SIGNING KEY
     private SecretKey getSigningKey() {

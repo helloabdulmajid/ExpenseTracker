@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +25,7 @@ public class IncomeCategoryServiceImpl
 
     private final UserRepository userRepository;
 
-    // GET USER CATEGORIES
+    // GET USER CATEGORIES (includes defaults)
     @Override
     public List<IncomeCategoryResponse>
     getIncomeCategoriesForUser(
@@ -33,9 +34,18 @@ public class IncomeCategoryServiceImpl
 
         getUserById(userId);
 
-        return incomeCategoryRepository
-                .findByUserId(userId)
-                .stream()
+        List<IncomeCategory> userCategories =
+                incomeCategoryRepository
+                        .findByUserId(userId);
+
+        List<IncomeCategory> defaultCategories =
+                incomeCategoryRepository
+                        .findByDefaultCategoryTrue();
+
+        return Stream.concat(
+                        userCategories.stream(),
+                        defaultCategories.stream()
+                )
                 .map(this::mapToResponse)
                 .toList();
     }

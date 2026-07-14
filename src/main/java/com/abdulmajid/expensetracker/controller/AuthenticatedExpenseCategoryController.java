@@ -8,7 +8,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,8 +16,8 @@ import java.util.List;
 @RequestMapping("expense-categories")
 @RequiredArgsConstructor
 @Tag(
-        name = "Authenticated Expense Category APIs",
-        description = "Authenticated user expense category APIs"
+        name = "Expense Category APIs",
+        description = "Manage expense categories"
 )
 public class AuthenticatedExpenseCategoryController {
 
@@ -27,11 +26,11 @@ public class AuthenticatedExpenseCategoryController {
     // GET MY CATEGORIES
     @GetMapping("/me")
     public ResponseEntity<List<ExpenseCategoryResponse>>
-    getMyCategories(Authentication authentication) {
+    getMyCategories() {
 
         return ResponseEntity.ok(
                 expenseCategoryService
-                        .getMyCategories(authentication)
+                        .getMyCategories()
         );
     }
 
@@ -40,8 +39,6 @@ public class AuthenticatedExpenseCategoryController {
     public ResponseEntity<ExpenseCategoryResponse>
     createMyCategory(
 
-            Authentication authentication,
-
             @Valid
             @RequestBody
             ExpenseCategoryRequest request
@@ -49,10 +46,7 @@ public class AuthenticatedExpenseCategoryController {
 
         ExpenseCategoryResponse response =
                 expenseCategoryService
-                        .createMyCategory(
-                                authentication,
-                                request
-                        );
+                        .createMyCategory(request);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -63,8 +57,6 @@ public class AuthenticatedExpenseCategoryController {
     @PutMapping("/me/{categoryId}")
     public ResponseEntity<ExpenseCategoryResponse>
     updateMyCategory(
-
-            Authentication authentication,
 
             @PathVariable
             Integer categoryId,
@@ -77,7 +69,6 @@ public class AuthenticatedExpenseCategoryController {
         return ResponseEntity.ok(
                 expenseCategoryService
                         .updateMyCategory(
-                                authentication,
                                 categoryId,
                                 request
                         )
@@ -89,17 +80,12 @@ public class AuthenticatedExpenseCategoryController {
     public ResponseEntity<String>
     deleteMyCategory(
 
-            Authentication authentication,
-
             @PathVariable
             Integer categoryId
     ) {
 
         expenseCategoryService
-                .deleteMyCategory(
-                        authentication,
-                        categoryId
-                );
+                .deleteMyCategory(categoryId);
 
         return ResponseEntity.ok(
                 "Category deleted successfully"
